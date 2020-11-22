@@ -1,6 +1,7 @@
 #include "Widget.h"
 #include "events.h"
 #include "Application.h"
+#include "Size.h"
 
 struct Widget
 {
@@ -96,6 +97,26 @@ ref(Application) WidgetApplication(ref(Widget) ctx)
 
 void _WidgetDestroy(ref(Widget) ctx)
 {
+  if(_(ctx).userData)
+  {
+    release(_(ctx).userData);
+  }
+
+#ifdef USE_X11
+  XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
+#endif
+
+  sstream_delete(_(ctx).type);
+  release(ctx);
+}
+
+int _WidgetDestroyed(ref(Widget) ctx)
+{
+  return _(ctx).destroyed;
+}
+
+void WidgetDestroy(ref(Widget) ctx)
+{
   if(!_(ctx).destroyed)
   {
     struct DestroyEvent ev = {0};
@@ -103,20 +124,24 @@ void _WidgetDestroy(ref(Widget) ctx)
     _(ctx).events.destroy(&ev);
     _(ctx).destroyed = 1;
   }
+}
 
-  if(_(ctx).userData)
-  {
-    release(_(ctx).userData);
-  }
+struct Size WidgetSize(ref(Widget) ctx)
+{
+  struct Size rtn = {0};
 
-  sstream_delete(_(ctx).type);
-  release(ctx);
+  return rtn;
 }
 
 #ifdef USE_X11
 Window _WidgetWindow(ref(Widget) ctx)
 {
   return _(ctx).window;
+}
+
+Atom _WidgetDeleteMessage(ref(Widget) ctx)
+{
+  return _(ctx).deleteMessage;
 }
 #endif
 

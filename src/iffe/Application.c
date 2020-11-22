@@ -1,5 +1,8 @@
 #include "Application.h"
 #include "Widget.h"
+#include "Size.h"
+
+#include <stdio.h>
 
 struct Application
 {
@@ -66,6 +69,67 @@ void _ApplicationRun(ref(Application) ctx)
     )
 
     if(!w) continue;
+
+    if(e.type == ConfigureNotify)
+    {
+      struct Size s = WidgetSize(w);
+
+      if(s.w != e.xconfigure.width ||
+        s.h != e.xconfigure.height)
+      {
+        printf("Resizing\n");
+/*
+        resize.width = e.xconfigure.width;
+        resize.height = e.xconfigure.height;
+        _WindowResize(w, resize);
+*/
+      }
+    }
+    else if(e.type == Expose)
+    {
+/*
+      paint.rectangle.x = e.xexpose.x;
+      paint.rectangle.y = e.xexpose.y;
+      paint.rectangle.width = e.xexpose.width;
+      paint.rectangle.height = e.xexpose.height;
+      _WindowPaint(w, paint);
+*/
+    }
+    else if(e.type == ButtonPress)
+    {
+/*
+      mouseDown.x = e.xbutton.x;
+      mouseDown.y = e.xbutton.y;
+      _WindowMouseDown(w, mouseDown);
+*/
+    }
+    else if(e.type == ButtonRelease)
+    {
+/*
+      mouseUp.x = e.xbutton.x;
+      mouseUp.y = e.xbutton.y;
+      _WindowMouseUp(w, mouseUp);
+*/
+    }
+    else if(e.type == ClientMessage)
+    {
+      if(e.xclient.data.l[0] == _WidgetDeleteMessage(w))
+      {
+        WidgetDestroy(w);
+      }
+    }
+
+    {size_t i = 0; for(; i < vector_size(_(ctx).windows); i++)
+    {
+      w = vector_at(_(ctx).windows, i);
+
+      if(_WidgetDestroyed(w))
+      {
+        _WidgetDestroy(w);
+        vector_erase(_(ctx).windows, i, 1);
+        i--;
+      }
+    }}
   }
 #endif
 }

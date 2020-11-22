@@ -113,17 +113,21 @@
 
 struct Widget;
 struct Application;
+struct Size;
 
 extern ref(Widget)_widgetLastWidget;
 
 ref(Application) WidgetApplication(ref(Widget) ctx);
 ref(Widget) WidgetParent(ref(Widget) ctx);
 ref(Widget) WidgetWindow(ref(Widget) ctx);
+void WidgetDestroy(ref(Widget) ctx);
+struct Size WidgetSize(ref(Widget) ctx);
 
 ref(sstream) WidgetType(ref(Widget) ctx);
 
 ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name);
 void _WidgetDestroy(ref(Widget) ctx);
+int _WidgetDestroyed(ref(Widget) ctx);
 
 void _WidgetSetEventTable(ref(Widget) ctx, struct EventTable *events);
 void _WidgetSetUserData(ref(Widget) ctx, refvoid userData);
@@ -136,6 +140,7 @@ void _WidgetClick(ref(Widget) ctx);
 
 #ifdef USE_X11
 Window _WidgetWindow(ref(Widget) ctx);
+Atom _WidgetDeleteMessage(ref(Widget) ctx);
 #endif
 
 #endif
