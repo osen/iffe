@@ -1,3 +1,6 @@
+#ifndef IFFE_EVENTS_H
+#define IFFE_EVENTS_H
+
 #include "stent.h"
 
 #define EVENT_COMMON \
@@ -38,4 +41,6 @@ struct EventTable
   void (*click)(struct ClickEvent *);
   void (*destroy)(struct DestroyEvent *);
 };
+
+#endif
 
