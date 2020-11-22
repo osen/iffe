@@ -5,6 +5,7 @@
 #include "Rect.h"
 #include "Graphics.h"
 #include "Color.h"
+#include "FlowProcessor.h"
 
 struct Widget
 {
@@ -13,10 +14,14 @@ struct Widget
   vector(ref(Widget)) children;
   struct EventTable events;
   refvoid userData;
-  int destroyed;
   ref(sstream) type;
+  struct Size size;
   struct Rect bounds;
   ref(Graphics) graphics;
+  ref(FlowProcessor) flowProcessor;
+
+  int destroyed;
+  int drawn;
 
 #ifdef USE_X11
   Window window;
@@ -35,7 +40,7 @@ static void _WidgetCreateWindow(ref(Widget) ctx)
   int screen = _ApplicationScreen(_(ctx).application);
 
   _(ctx).window = XCreateWindow(display, RootWindow(display, screen),
-    0, 0, _(ctx).bounds.w, _(ctx).bounds.h, 0, 0,
+    0, 0, _(ctx).size.w, _(ctx).size.h, 0, 0,
     CopyFromParent, CopyFromParent,
     0, NULL);
 
@@ -56,17 +61,20 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
   ref(Widget) rtn = allocate(Widget);
 
   _(rtn).children = vector_new(ref(Widget));
+  _(rtn).flowProcessor = _FlowProcessorCreate();
 
   if(parent)
   {
-    _(rtn).bounds = RectXywh(0, 0, 32, 32);
+    _(rtn).size = SizeWh(32, 32);
+    _(rtn).bounds = RectXywh(0, 0, _(rtn).size.w, _(rtn).size.h);
     _(rtn).parent = parent;
     _(rtn).application = _(parent).application;
     vector_push(_(parent).children, rtn);
   }
   else
   {
-    _(rtn).bounds = RectXywh(0, 0, 256, 256);
+    _(rtn).size = SizeWh(256, 256);
+    _(rtn).bounds = RectXywh(0, 0, _(rtn).size.w, _(rtn).size.h);
     _(rtn).application = _application;
     _ApplicationAddWidget(_application, rtn);
     _WidgetCreateWindow(rtn);
@@ -113,6 +121,7 @@ void _WidgetDestroy(ref(Widget) ctx)
   )
 
   vector_delete(_(ctx).children);
+  _FlowProcessorDestroy(_(ctx).flowProcessor);
 
   if(_(ctx).userData)
   {
@@ -155,20 +164,19 @@ void WidgetDestroy(ref(Widget) ctx)
   }
 }
 
+struct Rect WidgetBounds(ref(Widget) ctx)
+{
+  return _(ctx).bounds;
+}
+
 struct Size WidgetSize(ref(Widget) ctx)
 {
-  struct Size rtn = {0};
-
-  rtn.w = _(ctx).bounds.w;
-  rtn.h = _(ctx).bounds.h;
-
-  return rtn;
+  return _(ctx).size;
 }
 
 void WidgetSetSize(ref(Widget) ctx, struct Size size)
 {
-  _(ctx).bounds.w = size.w;
-  _(ctx).bounds.h = size.h;
+  _(ctx).size = size;
 }
 
 void _WidgetResize(ref(Widget) ctx, struct Size size)
@@ -179,6 +187,14 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
   _(ctx).events.resize(&ev);
   _(ctx).bounds.w = size.w;
   _(ctx).bounds.h = size.h;
+
+  /* Reset FlowProcessor to new size */
+  /* Update all child bounds based on LayoutProcessor */
+  /* Propagate resize event to each child */
+
+  foreach(ref(Widget) w, _(ctx).children,
+    _WidgetResize(w, WidgetSize(w));
+  )
 }
 
 void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
@@ -186,6 +202,12 @@ void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
   struct DrawEvent ev = {0};
   ev.sender = ctx;
   ev.graphics = _(ctx).graphics;
+
+  if(!_(ctx).drawn)
+  {
+    _WidgetResize(ctx, _(ctx).size);
+    _(ctx).drawn = 1;
+  }
 
   _GraphicsSetClip(_(ctx).graphics, rect);
   GraphicsFillRect(_(ctx).graphics, _(ctx).bounds, ColorRgb(225, 225, 225));
@@ -198,9 +220,51 @@ void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
   )
 }
 
-struct Rect WidgetBounds(ref(Widget) ctx)
+void WidgetFlow(ref(Widget) ctx, char *str)
 {
-  return _(ctx).bounds;
+  ref(sstream) s = sstream_new_cstr(str);
+  int expand = 0;
+  ref(Widget) parent = WidgetParent(ctx);
+
+  {size_t i = 0; for(; i < sstream_length(s); i++)
+  {
+    char c = sstream_at(s, i);
+
+    if(c == '=')
+    {
+      expand = 10;
+      continue;
+    }
+    else if(c == '^')
+    {
+      _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
+        FLOW_MOVE_UP + expand);
+    }
+    else if(c == 'v')
+    {
+      _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
+        FLOW_MOVE_DOWN + expand);
+    }
+    else if(c == '<')
+    {
+      _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
+        FLOW_MOVE_LEFT + expand);
+    }
+    else if(c == '>')
+    {
+      _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
+        FLOW_MOVE_RIGHT + expand);
+    }
+
+    expand = 0;
+  }}
+
+  sstream_delete(s);
+}
+
+ref(Widget) WidgetParent(ref(Widget) ctx)
+{
+  return _(ctx).parent;
 }
 
 #ifdef USE_X11

@@ -126,6 +126,7 @@ void WidgetDestroy(ref(Widget) ctx);
 void WidgetSetSize(ref(Widget) ctx, struct Size size);
 struct Size WidgetSize(ref(Widget) ctx);
 struct Rect WidgetBounds(ref(Widget) ctx);
+void WidgetFlow(ref(Widget) ctx, char *str);
 
 ref(sstream) WidgetType(ref(Widget) ctx);
 

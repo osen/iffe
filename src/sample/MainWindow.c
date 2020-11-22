@@ -10,7 +10,11 @@ widget(MainWindow, Init Resize Draw)
 void OnInit(struct InitEvent *ev)
 {
   printf("OnInit\n");
-  WidgetAdd(ev->sender, Button);
+  ref(Widget) close = WidgetAdd(ev->sender, Button);
+  WidgetFlow(close, "^<");
+
+  ref(Widget) next = WidgetAdd(ev->sender, Button);
+  WidgetFlow(next, "^>");
 }
 
 void OnResize(struct ResizeEvent *ev)
