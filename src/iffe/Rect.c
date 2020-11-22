@@ -12,3 +12,14 @@ struct Rect RectXywh(int x, int y, int w, int h)
   return rtn;
 }
 
+struct Rect RectAdd(struct Rect a, struct Rect b)
+{
+  struct Rect rtn = a;
+
+  rtn.x += b.x;
+  rtn.y += b.y;
+  rtn.w += b.w;
+  rtn.h += b.h;
+
+  return rtn;
+}

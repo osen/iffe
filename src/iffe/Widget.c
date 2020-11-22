@@ -169,6 +169,11 @@ struct Rect WidgetBounds(ref(Widget) ctx)
   return _(ctx).bounds;
 }
 
+void _WidgetSetBounds(ref(Widget) ctx, struct Rect bounds)
+{
+  _(ctx).bounds = bounds;
+}
+
 struct Size WidgetSize(ref(Widget) ctx)
 {
   return _(ctx).size;
@@ -188,12 +193,14 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
   _(ctx).bounds.w = size.w;
   _(ctx).bounds.h = size.h;
 
-  /* Reset FlowProcessor to new size */
+  _FlowProcessorReset(_(ctx).flowProcessor, size, _(ctx).children);
+
   /* Update all child bounds based on LayoutProcessor */
   /* Propagate resize event to each child */
 
   foreach(ref(Widget) w, _(ctx).children,
-    _WidgetResize(w, WidgetSize(w));
+    //_WidgetResize(w, WidgetSize(w));
+    _WidgetResize(w, SizeWh(_(w).bounds.w, _(w).bounds.h));
   )
 }
 

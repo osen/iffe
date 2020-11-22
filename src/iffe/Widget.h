@@ -137,6 +137,7 @@ int _WidgetDestroyed(ref(Widget) ctx);
 void _WidgetSetEventTable(ref(Widget) ctx, struct EventTable *events);
 void _WidgetSetUserData(ref(Widget) ctx, refvoid userData);
 refvoid _WidgetUserData(ref(Widget) ctx);
+void _WidgetSetBounds(ref(Widget) ctx, struct Rect bounds);
 
 void _WidgetInit(ref(Widget) ctx);
 void _WidgetResize(ref(Widget) ctx, struct Size size);
