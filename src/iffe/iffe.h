@@ -4,5 +4,8 @@
 #include "Widget.h"
 #include "entry.h"
 #include "Application.h"
+#include "Graphics.h"
+#include "Rect.h"
+#include "Color.h"
 
 #endif

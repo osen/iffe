@@ -2,6 +2,9 @@
 #include "events.h"
 #include "Application.h"
 #include "Size.h"
+#include "Rect.h"
+#include "Graphics.h"
+#include "Color.h"
 
 struct Widget
 {
@@ -12,6 +15,8 @@ struct Widget
   refvoid userData;
   int destroyed;
   ref(sstream) type;
+  struct Rect bounds;
+  ref(Graphics) graphics;
 
 #ifdef USE_X11
   Window window;
@@ -30,7 +35,7 @@ static void _WidgetCreateWindow(ref(Widget) ctx)
   int screen = _ApplicationScreen(_(ctx).application);
 
   _(ctx).window = XCreateWindow(display, RootWindow(display, screen),
-    0, 0, 640, 480, 0, 0,
+    0, 0, _(ctx).bounds.w, _(ctx).bounds.h, 0, 0,
     CopyFromParent, CopyFromParent,
     0, NULL);
 
@@ -52,14 +57,17 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
 
   if(parent)
   {
+    _(rtn).bounds = RectXywh(0, 0, 32, 32);
     _(rtn).parent = parent;
     _(rtn).application = _(parent).application;
   }
   else
   {
+    _(rtn).bounds = RectXywh(0, 0, 256, 256);
     _(rtn).application = _application;
     _ApplicationAddWidget(_application, rtn);
     _WidgetCreateWindow(rtn);
+    _(rtn).graphics = _GraphicsCreate(rtn);
   }
 
   _(rtn).type = sstream_new_cstr(name);
@@ -102,6 +110,11 @@ void _WidgetDestroy(ref(Widget) ctx)
     release(_(ctx).userData);
   }
 
+  if(_(ctx).graphics)
+  {
+    _GraphicsDestroy(_(ctx).graphics);
+  }
+
 #ifdef USE_X11
   XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
 #endif
@@ -130,13 +143,41 @@ struct Size WidgetSize(ref(Widget) ctx)
 {
   struct Size rtn = {0};
 
+  rtn.w = _(ctx).bounds.w;
+  rtn.h = _(ctx).bounds.h;
+
   return rtn;
+}
+
+void _WidgetResize(ref(Widget) ctx, struct Size size)
+{
+  struct ResizeEvent ev = {0};
+  ev.sender = ctx;
+  ev.size = size;
+  _(ctx).events.resize(&ev);
+  _(ctx).bounds.w = size.w;
+  _(ctx).bounds.h = size.h;
+}
+
+void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
+{
+  struct DrawEvent ev = {0};
+  ev.sender = ctx;
+  ev.graphics = _(ctx).graphics;
+
+  GraphicsFillRect(_(ctx).graphics, rect, ColorRgb(225, 225, 225));
+  _(ctx).events.draw(&ev);
 }
 
 #ifdef USE_X11
 Window _WidgetWindow(ref(Widget) ctx)
 {
   return _(ctx).window;
+}
+
+GC _WidgetGc(ref(Widget) ctx)
+{
+  return _(ctx).gc;
 }
 
 Atom _WidgetDeleteMessage(ref(Widget) ctx)

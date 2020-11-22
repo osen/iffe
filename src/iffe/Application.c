@@ -1,8 +1,7 @@
 #include "Application.h"
 #include "Widget.h"
 #include "Size.h"
-
-#include <stdio.h>
+#include "Rect.h"
 
 struct Application
 {
@@ -77,23 +76,13 @@ void _ApplicationRun(ref(Application) ctx)
       if(s.w != e.xconfigure.width ||
         s.h != e.xconfigure.height)
       {
-        printf("Resizing\n");
-/*
-        resize.width = e.xconfigure.width;
-        resize.height = e.xconfigure.height;
-        _WindowResize(w, resize);
-*/
+        _WidgetResize(w, SizeWh(e.xconfigure.width, e.xconfigure.height));
       }
     }
     else if(e.type == Expose)
     {
-/*
-      paint.rectangle.x = e.xexpose.x;
-      paint.rectangle.y = e.xexpose.y;
-      paint.rectangle.width = e.xexpose.width;
-      paint.rectangle.height = e.xexpose.height;
-      _WindowPaint(w, paint);
-*/
+      _WidgetDraw(w, RectXywh(e.xexpose.x, e.xexpose.y,
+        e.xexpose.width, e.xexpose.height));
     }
     else if(e.type == ButtonPress)
     {

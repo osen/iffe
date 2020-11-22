@@ -63,6 +63,7 @@
   {                                    \
     struct EventTable et = { 0 };      \
     et.init = _OnInit;                 \
+    et.resize = _OnResize;             \
     et.draw = _OnDraw;                 \
     et.click = _OnClick;               \
     et.destroy = _OnDestroy;           \
@@ -114,6 +115,7 @@
 struct Widget;
 struct Application;
 struct Size;
+struct Rect;
 
 extern ref(Widget)_widgetLastWidget;
 
@@ -134,13 +136,14 @@ void _WidgetSetUserData(ref(Widget) ctx, refvoid userData);
 refvoid _WidgetUserData(ref(Widget) ctx);
 
 void _WidgetInit(ref(Widget) ctx);
-void _WidgetResize(ref(Widget) ctx);
-void _WidgetDraw(ref(Widget) ctx);
+void _WidgetResize(ref(Widget) ctx, struct Size size);
+void _WidgetDraw(ref(Widget) ctx, struct Rect rect);
 void _WidgetClick(ref(Widget) ctx);
 
 #ifdef USE_X11
 Window _WidgetWindow(ref(Widget) ctx);
 Atom _WidgetDeleteMessage(ref(Widget) ctx);
+GC _WidgetGc(ref(Widget) ctx);
 #endif
 
 #endif

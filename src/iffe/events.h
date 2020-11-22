@@ -2,11 +2,13 @@
 #define IFFE_EVENTS_H
 
 #include "stent.h"
+#include "Size.h"
 
 #define EVENT_COMMON \
   ref(Widget) sender
 
 struct Widget;
+struct Graphics;
 
 struct InitEvent
 {
@@ -16,11 +18,13 @@ struct InitEvent
 struct ResizeEvent
 {
   EVENT_COMMON;
+  struct Size size;
 };
 
 struct DrawEvent
 {
   EVENT_COMMON;
+  ref(Graphics) graphics;
 };
 
 struct ClickEvent
