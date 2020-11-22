@@ -11,6 +11,7 @@
 struct Graphics
 {
   ref(Widget) widget;
+  struct Rect clip;
 };
 
 #ifdef USE_X11
@@ -44,6 +45,11 @@ ref(Graphics) _GraphicsCreate(ref(Widget) widget)
 void _GraphicsDestroy(ref(Graphics) ctx)
 {
   release(ctx);
+}
+
+void _GraphicsSetClip(ref(Graphics) ctx, struct Rect clip)
+{
+  _(ctx).clip = clip;
 }
 
 void GraphicsFillRect(ref(Graphics) ctx, struct Rect rect, struct Color color)

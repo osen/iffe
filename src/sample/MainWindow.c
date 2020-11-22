@@ -7,21 +7,19 @@ widget(MainWindow, Init Resize Draw)
   int dummy;
 };
 
-void OnInit(struct InitEvent *event)
+void OnInit(struct InitEvent *ev)
 {
   printf("OnInit\n");
+  WidgetAdd(ev->sender, Button);
 }
 
-void OnResize(struct ResizeEvent *event)
+void OnResize(struct ResizeEvent *ev)
 {
   printf("OnResize\n");
 }
 
-void OnDraw(struct DrawEvent *event)
+void OnDraw(struct DrawEvent *ev)
 {
-  ref(Graphics) g = event->graphics;
-
   printf("OnDraw\n");
-  GraphicsFillRect(g, RectXywh(10, 10, 100, 100), ColorRgb(255, 0, 0));
 }
 

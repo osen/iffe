@@ -123,7 +123,9 @@ ref(Application) WidgetApplication(ref(Widget) ctx);
 ref(Widget) WidgetParent(ref(Widget) ctx);
 ref(Widget) WidgetWindow(ref(Widget) ctx);
 void WidgetDestroy(ref(Widget) ctx);
+void WidgetSetSize(ref(Widget) ctx, struct Size size);
 struct Size WidgetSize(ref(Widget) ctx);
+struct Rect WidgetBounds(ref(Widget) ctx);
 
 ref(sstream) WidgetType(ref(Widget) ctx);
 

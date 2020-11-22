@@ -55,11 +55,14 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
 {
   ref(Widget) rtn = allocate(Widget);
 
+  _(rtn).children = vector_new(ref(Widget));
+
   if(parent)
   {
     _(rtn).bounds = RectXywh(0, 0, 32, 32);
     _(rtn).parent = parent;
     _(rtn).application = _(parent).application;
+    vector_push(_(parent).children, rtn);
   }
   else
   {
@@ -105,6 +108,12 @@ ref(Application) WidgetApplication(ref(Widget) ctx)
 
 void _WidgetDestroy(ref(Widget) ctx)
 {
+  foreach(ref(Widget) w, _(ctx).children,
+    _WidgetDestroy(w);
+  )
+
+  vector_delete(_(ctx).children);
+
   if(_(ctx).userData)
   {
     release(_(ctx).userData);
@@ -115,9 +124,12 @@ void _WidgetDestroy(ref(Widget) ctx)
     _GraphicsDestroy(_(ctx).graphics);
   }
 
+  if(!_(ctx).parent)
+  {
 #ifdef USE_X11
-  XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
+    XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
 #endif
+  }
 
   sstream_delete(_(ctx).type);
   release(ctx);
@@ -136,6 +148,10 @@ void WidgetDestroy(ref(Widget) ctx)
     ev.sender = ctx;
     _(ctx).events.destroy(&ev);
     _(ctx).destroyed = 1;
+
+    foreach(ref(Widget) w, _(ctx).children,
+      WidgetDestroy(w);
+    )
   }
 }
 
@@ -147,6 +163,12 @@ struct Size WidgetSize(ref(Widget) ctx)
   rtn.h = _(ctx).bounds.h;
 
   return rtn;
+}
+
+void WidgetSetSize(ref(Widget) ctx, struct Size size)
+{
+  _(ctx).bounds.w = size.w;
+  _(ctx).bounds.h = size.h;
 }
 
 void _WidgetResize(ref(Widget) ctx, struct Size size)
@@ -165,8 +187,20 @@ void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
   ev.sender = ctx;
   ev.graphics = _(ctx).graphics;
 
-  GraphicsFillRect(_(ctx).graphics, rect, ColorRgb(225, 225, 225));
+  _GraphicsSetClip(_(ctx).graphics, rect);
+  GraphicsFillRect(_(ctx).graphics, _(ctx).bounds, ColorRgb(225, 225, 225));
+
   _(ctx).events.draw(&ev);
+
+  foreach(ref(Widget) w, _(ctx).children,
+    ev.sender = w;
+    _(w).events.draw(&ev);
+  )
+}
+
+struct Rect WidgetBounds(ref(Widget) ctx)
+{
+  return _(ctx).bounds;
 }
 
 #ifdef USE_X11
