@@ -1,18 +1,11 @@
 #include "stent.h"
 #include "Widget.h"
 
-#define ApplicationAdd(A, T)                  \
-  _widgetLastWidget = _ApplicationAdd(A, #T); \
-  do                                          \
-  {                                           \
-    void _##T##Init(ref(Widget) ctx);         \
-    ref(Widget) w = _widgetLastWidget;        \
-    _widgetLastWidget = NULL;                 \
-    if(!w) panic("Invalid construct");        \
-    _##T##Init(w);                            \
-    _WidgetInit(w);                           \
-  }                                           \
-  while(0)
+#include "config.h"
+
+#ifdef USE_X11
+  #include <X11/Xlib.h>
+#endif
 
 struct Application;
 
@@ -20,5 +13,10 @@ ref(Application) _ApplicationCreate();
 void _ApplicationDestroy(ref(Application) ctx);
 
 void _ApplicationRun(ref(Application) ctx);
-ref(Widget) _ApplicationAdd(ref(Application) ctx, const char *name);
 
+void _ApplicationAddWidget(ref(Application) ctx, ref(Widget) widget);
+
+#ifdef USE_X11
+Display *_ApplicationDisplay(ref(Application) ctx);
+int _ApplicationScreen(ref(Application) ctx);
+#endif

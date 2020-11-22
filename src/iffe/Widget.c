@@ -11,25 +11,56 @@ struct Widget
   refvoid userData;
   int destroyed;
   ref(sstream) type;
+
+#ifdef USE_X11
+  Window window;
+  Atom deleteMessage;
+  GC gc;
+#endif
 };
 
 ref(Widget)_widgetLastWidget;
+extern ref(Application) _application;
 
-ref(Widget) _WidgetCreateRoot(ref(Application) app, const char *name)
+static void _WidgetCreateWindow(ref(Widget) ctx)
 {
-  ref(Widget) rtn = allocate(Widget);
+#ifdef USE_X11
+  Display *display = _ApplicationDisplay(_(ctx).application);
+  int screen = _ApplicationScreen(_(ctx).application);
 
-  _(rtn).application = app;
-  _(rtn).type = sstream_new_cstr(name);
+  _(ctx).window = XCreateWindow(display, RootWindow(display, screen),
+    0, 0, 640, 480, 0, 0,
+    CopyFromParent, CopyFromParent,
+    0, NULL);
 
-  return rtn;
+  _(ctx).gc = DefaultGC(display, screen);
+
+  XSelectInput(display, _(ctx).window,
+    ExposureMask | KeyPressMask | ButtonPressMask | ButtonReleaseMask | StructureNotifyMask);
+
+  _(ctx).deleteMessage = XInternAtom(display, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(display, _(ctx).window, &_(ctx).deleteMessage, 1);
+
+  XMapWindow(display, _(ctx).window);
+#endif
 }
 
 ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
 {
   ref(Widget) rtn = allocate(Widget);
 
-  _(rtn).parent = parent;
+  if(parent)
+  {
+    _(rtn).parent = parent;
+    _(rtn).application = _(parent).application;
+  }
+  else
+  {
+    _(rtn).application = _application;
+    _ApplicationAddWidget(_application, rtn);
+    _WidgetCreateWindow(rtn);
+  }
+
   _(rtn).type = sstream_new_cstr(name);
 
   return rtn;
@@ -60,12 +91,7 @@ void _WidgetInit(ref(Widget) ctx)
 
 ref(Application) WidgetApplication(ref(Widget) ctx)
 {
-  if(_(ctx).application)
-  {
-    return _(ctx).application;
-  }
-
-  return WidgetApplication(_(ctx).parent);
+  return _(ctx).application;
 }
 
 void _WidgetDestroy(ref(Widget) ctx)
@@ -86,4 +112,11 @@ void _WidgetDestroy(ref(Widget) ctx)
   sstream_delete(_(ctx).type);
   release(ctx);
 }
+
+#ifdef USE_X11
+Window _WidgetWindow(ref(Widget) ctx)
+{
+  return _(ctx).window;
+}
+#endif
 

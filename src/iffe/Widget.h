@@ -3,6 +3,11 @@
 
 #include "stent.h"
 #include "events.h"
+#include "config.h"
+
+#ifdef USE_X11
+  #include <X11/Xlib.h>
+#endif
 
 #define Init                                                     \
   static void OnInit(struct InitEvent *);                        \
@@ -94,7 +99,7 @@
 #endif
 
 #define WidgetAdd(W, T)                  \
-  _widgetLastWidget = _WidgetAdd(W, #T); \
+  _widgetLastWidget = _WidgetCreate(W, #T); \
   do                                     \
   {                                      \
     void _##T##Init(ref(Widget) ctx);    \
@@ -118,7 +123,6 @@ ref(Widget) WidgetWindow(ref(Widget) ctx);
 ref(sstream) WidgetType(ref(Widget) ctx);
 
 ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name);
-ref(Widget) _WidgetCreateRoot(ref(Application) app, const char *name);
 void _WidgetDestroy(ref(Widget) ctx);
 
 void _WidgetSetEventTable(ref(Widget) ctx, struct EventTable *events);
@@ -129,6 +133,10 @@ void _WidgetInit(ref(Widget) ctx);
 void _WidgetResize(ref(Widget) ctx);
 void _WidgetDraw(ref(Widget) ctx);
 void _WidgetClick(ref(Widget) ctx);
+
+#ifdef USE_X11
+Window _WidgetWindow(ref(Widget) ctx);
+#endif
 
 #endif
 
