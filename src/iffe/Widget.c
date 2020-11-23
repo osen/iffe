@@ -208,6 +208,25 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
   foreach(ref(Widget) w, _(ctx).children,
     _WidgetResize(w, SizeWh(_(w).bounds.w, _(w).bounds.h));
   )
+
+  /*
+   * If root window, redraw everything because layouts likely changed.
+   */
+  if(_(ctx).graphics)
+  {
+    /*
+     * _WidgetDraw(ctx, RectXywh(0, 0, _(ctx).bounds.w, _(ctx).bounds.h));
+     */
+
+    /*
+     * XClearArea(_ApplicationDisplay(_(ctx).application),
+     *   _(ctx).window,
+     *   0, 0, _(ctx).bounds.w, _(ctx).bounds.h,
+     *   True);
+     */
+
+    XClearArea(_ApplicationDisplay(_(ctx).application), _(ctx).window, 0, 0, 0, 0, True);
+  }
 }
 
 ref(Widget) WidgetRoot(ref(Widget) ctx)
@@ -233,24 +252,31 @@ void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
   ref(Graphics) g = _(root).graphics;
   struct DrawEvent ev = {0};
 
-  ev.sender = ctx;
-  ev.graphics = g;
-
-  if(!_(ctx).drawn)
+  /*
+   * First expose happens before a resize so make sure to position children
+   * before this first draw. Resize begins a draw anyway so return here so
+   * not to redraw twice.
+   */
+  if(_(ctx).graphics)
   {
-    _WidgetResize(ctx, RectSize(_(ctx).bounds));
-    _(ctx).drawn = 1;
+    if(!_(ctx).drawn)
+    {
+      _(ctx).drawn = 1;
+      _WidgetResize(ctx, RectSize(_(ctx).bounds));
+
+      return;
+    }
   }
 
   _GraphicsSetClip(g, rect);
   GraphicsFillRect(g, _(ctx).bounds, ColorRgb(225, 225, 225));
 
+  ev.sender = ctx;
+  ev.graphics = g;
   _(ctx).events.draw(&ev);
 
   foreach(ref(Widget) w, _(ctx).children,
     _WidgetDraw(w, rect);
-    //ev.sender = w;
-    //_(w).events.draw(&ev);
   )
 }
 

@@ -77,7 +77,7 @@ void _ApplicationRun(ref(Application) ctx)
         s.h != e.xconfigure.height)
       {
         _WidgetResize(w, SizeWh(e.xconfigure.width, e.xconfigure.height));
-        _WidgetDraw(w, RectXywh(0, 0, s.w, s.h));
+        //_WidgetDraw(w, RectXywh(0, 0, s.w, s.h));
       }
     }
     else if(e.type == Expose)
