@@ -1,16 +1,12 @@
 #include <iffe/iffe.h>
 
-#include <stdio.h>
-
-widget(MainWindow, Init Resize Draw)
+widget(MainWindow, Init)
 {
   int dummy;
 };
 
 void OnInit(struct InitEvent *ev)
 {
-  printf("OnInit\n");
-
   ref(Widget) panel = WidgetAdd(ev->sender, Spacer);
   WidgetSetHeight(panel, 100);
   WidgetFlow(panel, "^=<");
@@ -28,15 +24,5 @@ void OnInit(struct InitEvent *ev)
   WidgetFlow(w, ">");
 
   WidgetFlow(sw, "v");
-}
-
-void OnResize(struct ResizeEvent *ev)
-{
-  printf("OnResize\n");
-}
-
-void OnDraw(struct DrawEvent *ev)
-{
-  printf("OnDraw\n");
 }
 
