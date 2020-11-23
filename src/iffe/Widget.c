@@ -184,6 +184,16 @@ void WidgetSetSize(ref(Widget) ctx, struct Size size)
   _(ctx).size = size;
 }
 
+void WidgetSetWidth(ref(Widget) ctx, int width)
+{
+  _(ctx).size.w = width;
+}
+
+void WidgetSetHeight(ref(Widget) ctx, int height)
+{
+  _(ctx).size.h = height;
+}
+
 void _WidgetResize(ref(Widget) ctx, struct Size size)
 {
   struct ResizeEvent ev = {0};
@@ -193,37 +203,54 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
   _(ctx).bounds.w = size.w;
   _(ctx).bounds.h = size.h;
 
-  _FlowProcessorReset(_(ctx).flowProcessor, size, _(ctx).children);
-
-  /* Update all child bounds based on LayoutProcessor */
-  /* Propagate resize event to each child */
+  _FlowProcessorReset(_(ctx).flowProcessor, _(ctx).bounds, _(ctx).children);
 
   foreach(ref(Widget) w, _(ctx).children,
-    //_WidgetResize(w, WidgetSize(w));
     _WidgetResize(w, SizeWh(_(w).bounds.w, _(w).bounds.h));
   )
 }
 
+ref(Widget) WidgetRoot(ref(Widget) ctx)
+{
+  ref(Widget) rtn = ctx;
+
+  while(1)
+  {
+    if(!WidgetParent(rtn))
+    {
+      break;
+    }
+
+    rtn = WidgetParent(rtn);
+  }
+
+  return rtn;
+}
+
 void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
 {
+  ref(Widget) root = WidgetRoot(ctx);
+  ref(Graphics) g = _(root).graphics;
   struct DrawEvent ev = {0};
+
   ev.sender = ctx;
-  ev.graphics = _(ctx).graphics;
+  ev.graphics = g;
 
   if(!_(ctx).drawn)
   {
-    _WidgetResize(ctx, _(ctx).size);
+    _WidgetResize(ctx, RectSize(_(ctx).bounds));
     _(ctx).drawn = 1;
   }
 
-  _GraphicsSetClip(_(ctx).graphics, rect);
-  GraphicsFillRect(_(ctx).graphics, _(ctx).bounds, ColorRgb(225, 225, 225));
+  _GraphicsSetClip(g, rect);
+  GraphicsFillRect(g, _(ctx).bounds, ColorRgb(225, 225, 225));
 
   _(ctx).events.draw(&ev);
 
   foreach(ref(Widget) w, _(ctx).children,
-    ev.sender = w;
-    _(w).events.draw(&ev);
+    _WidgetDraw(w, rect);
+    //ev.sender = w;
+    //_(w).events.draw(&ev);
   )
 }
 

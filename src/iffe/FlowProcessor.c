@@ -1,6 +1,7 @@
 #include "FlowProcessor.h"
 #include "Widget.h"
 #include "Rect.h"
+#include "Size.h"
 
 #include <stdio.h>
 
@@ -154,8 +155,9 @@ static void _FlowProcessorProcess(ref(FlowProcessor) ctx, struct FlowInstruction
   _WidgetSetBounds(w, bounds);
 }
 
-void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Size size, vector(ref(Widget)) children)
+void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Rect bounds, vector(ref(Widget)) children)
 {
+  struct Size size = SizeWh(bounds.w, bounds.h);
   _(ctx).size = size;
   _(ctx).children = children;
 
@@ -170,6 +172,13 @@ void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Size size, vector(ref(Wi
 
   foreach(struct FlowInstruction fi, _(ctx).instructions,
     _FlowProcessorProcess(ctx, fi);
+  )
+
+  foreach(ref(Widget) w, children,
+    struct Rect b = WidgetBounds(w);
+    b.x += bounds.x;
+    b.y += bounds.y;
+    _WidgetSetBounds(w, b);
   )
 
 /*

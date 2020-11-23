@@ -12,7 +12,7 @@
 
 struct FlowProcessor;
 struct Widget;
-struct Size;
+struct Rect;
 
 ref(FlowProcessor) _FlowProcessorCreate();
 void _FlowProcessorDestroy(ref(FlowProcessor) ctx);
@@ -20,4 +20,4 @@ void _FlowProcessorDestroy(ref(FlowProcessor) ctx);
 void _FlowProcessorAddInstruction(ref(FlowProcessor) ctx,
   ref(Widget) widget, int instruction);
 
-void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Size size, vector(ref(Widget)) children);
+void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Rect bounds, vector(ref(Widget)) children);

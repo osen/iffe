@@ -124,6 +124,8 @@ ref(Widget) WidgetParent(ref(Widget) ctx);
 ref(Widget) WidgetWindow(ref(Widget) ctx);
 void WidgetDestroy(ref(Widget) ctx);
 void WidgetSetSize(ref(Widget) ctx, struct Size size);
+void WidgetSetWidth(ref(Widget) ctx, int width);
+void WidgetSetHeight(ref(Widget) ctx, int height);
 struct Size WidgetSize(ref(Widget) ctx);
 struct Rect WidgetBounds(ref(Widget) ctx);
 void WidgetFlow(ref(Widget) ctx, char *str);
