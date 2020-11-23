@@ -61,3 +61,42 @@ void GraphicsFillRect(ref(Graphics) ctx, struct Rect rect, struct Color color)
     _GraphicsGc(ctx), rect.x, rect.y, rect.w, rect.h);
 }
 
+void GraphicsDrawRect(ref(Graphics) ctx, struct Rect rect, struct Color color)
+{
+  rect.w -= 1;
+  rect.h -= 1;
+
+  XSetForeground(_GraphicsDisplay(ctx), _GraphicsGc(ctx), ColorXColor(color).pixel);
+
+  XDrawRectangle(_GraphicsDisplay(ctx),
+    _GraphicsWindow(ctx),
+    _GraphicsGc(ctx), rect.x, rect.y, rect.w, rect.h);
+}
+
+void GraphicsRaisedRect(ref(Graphics) ctx, struct Rect rect, struct Color color)
+{
+  struct Rect l = {0};
+
+  GraphicsFillRect(ctx, rect, color);
+  GraphicsDrawRect(ctx, rect, ColorLight(color));
+
+  l.x = rect.x;
+  l.y = rect.y + rect.h - 1;
+  l.w = rect.x + rect.w - 1;
+  l.h = l.y;
+  GraphicsDrawLine(ctx, l, ColorDark(color));
+
+  l.x = rect.x + rect.w - 1;
+  l.y = rect.y;
+  l.w = l.x;
+  l.h = rect.y + rect.h - 1;
+  GraphicsDrawLine(ctx, l, ColorDark(color));
+}
+
+void GraphicsDrawLine(ref(Graphics) ctx, struct Rect rect, struct Color color)
+{
+  XSetForeground(_GraphicsDisplay(ctx), _GraphicsGc(ctx), ColorXColor(color).pixel);
+
+  XDrawLine(_GraphicsDisplay(ctx), _GraphicsWindow(ctx), _GraphicsGc(ctx),
+    rect.x, rect.y, rect.w, rect.h);
+}

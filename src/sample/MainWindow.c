@@ -7,7 +7,7 @@ widget(MainWindow, Init)
 
 void OnInit(struct InitEvent *ev)
 {
-  ref(Widget) panel = WidgetAdd(ev->sender, Spacer);
+  ref(Widget) panel = WidgetAdd(ev->sender, Panel);
   WidgetSetHeight(panel, 100);
   WidgetFlow(panel, "^=<");
 

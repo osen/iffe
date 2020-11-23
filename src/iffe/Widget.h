@@ -129,6 +129,8 @@ void WidgetSetHeight(ref(Widget) ctx, int height);
 struct Size WidgetSize(ref(Widget) ctx);
 struct Rect WidgetBounds(ref(Widget) ctx);
 void WidgetFlow(ref(Widget) ctx, char *str);
+struct Color WidgetBackground(ref(Widget) ctx);
+void WidgetSetBackground(ref(Widget) ctx, struct Color background);
 
 ref(sstream) WidgetType(ref(Widget) ctx);
 

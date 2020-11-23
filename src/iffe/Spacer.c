@@ -18,6 +18,6 @@ void OnDraw(struct DrawEvent *ev)
 {
   ref(Graphics) g = ev->graphics;
 
-  GraphicsFillRect(g, WidgetBounds(ev->sender), ColorRgb(0, 0, 0));
+  GraphicsFillRect(g, WidgetBounds(ev->sender), ColorDark(WidgetBackground(ev->sender)));
 }
 

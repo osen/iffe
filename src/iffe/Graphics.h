@@ -10,4 +10,6 @@ void _GraphicsDestroy(ref(Graphics) ctx);
 void _GraphicsSetClip(ref(Graphics) ctx, struct Rect clip);
 
 void GraphicsFillRect(ref(Graphics) ctx, struct Rect rect, struct Color color);
-
+void GraphicsDrawRect(ref(Graphics) ctx, struct Rect rect, struct Color color);
+void GraphicsRaisedRect(ref(Graphics) ctx, struct Rect rect, struct Color color);
+void GraphicsDrawLine(ref(Graphics) ctx, struct Rect rect, struct Color color);

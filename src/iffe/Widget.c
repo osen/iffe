@@ -19,6 +19,7 @@ struct Widget
   struct Rect bounds;
   ref(Graphics) graphics;
   ref(FlowProcessor) flowProcessor;
+  struct Color background;
 
   int destroyed;
   int drawn;
@@ -62,6 +63,7 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
 
   _(rtn).children = vector_new(ref(Widget));
   _(rtn).flowProcessor = _FlowProcessorCreate();
+  _(rtn).background = ColorRgb(WIDGET_COLOR);
 
   if(parent)
   {
@@ -325,6 +327,16 @@ void WidgetFlow(ref(Widget) ctx, char *str)
 ref(Widget) WidgetParent(ref(Widget) ctx)
 {
   return _(ctx).parent;
+}
+
+struct Color WidgetBackground(ref(Widget) ctx)
+{
+  return _(ctx).background;
+}
+
+void WidgetSetBackground(ref(Widget) ctx, struct Color background)
+{
+  _(ctx).background = background;
 }
 
 #ifdef USE_X11
