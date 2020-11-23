@@ -30,9 +30,9 @@ struct Color ColorLight(struct Color ctx)
 {
   struct Color rtn = ctx;
 
-  rtn.r = min(255, rtn.r + HIGHLIGHT);
-  rtn.g = min(255, rtn.g + HIGHLIGHT);
-  rtn.b = min(255, rtn.b + HIGHLIGHT);
+  rtn.r = min(255, rtn.r + LIGHT_AMOUNT);
+  rtn.g = min(255, rtn.g + LIGHT_AMOUNT);
+  rtn.b = min(255, rtn.b + LIGHT_AMOUNT);
 
   return rtn;
 }
@@ -41,9 +41,9 @@ struct Color ColorDark(struct Color ctx)
 {
   struct Color rtn = ctx;
 
-  rtn.r = max(0, rtn.r - HIGHLIGHT);
-  rtn.g = max(0, rtn.g - HIGHLIGHT);
-  rtn.b = max(0, rtn.b - HIGHLIGHT);
+  rtn.r = max(0, rtn.r - DARK_AMOUNT);
+  rtn.g = max(0, rtn.g - DARK_AMOUNT);
+  rtn.b = max(0, rtn.b - DARK_AMOUNT);
 
   return rtn;
 }

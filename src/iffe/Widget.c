@@ -184,6 +184,14 @@ struct Size WidgetSize(ref(Widget) ctx)
 void WidgetSetSize(ref(Widget) ctx, struct Size size)
 {
   _(ctx).size = size;
+
+#ifdef USE_X11
+  if(_(ctx).graphics)
+  {
+    XResizeWindow(_ApplicationDisplay(_(ctx).application),
+      _(ctx).window, size.w, size.h);
+  }
+#endif
 }
 
 void WidgetSetWidth(ref(Widget) ctx, int width)
