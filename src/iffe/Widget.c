@@ -285,7 +285,7 @@ void _WidgetDraw(ref(Widget) ctx, struct Rect rect)
 void WidgetFlow(ref(Widget) ctx, char *str)
 {
   ref(sstream) s = sstream_new_cstr(str);
-  int expand = 0;
+  int mod = 0;
   ref(Widget) parent = WidgetParent(ctx);
 
   {size_t i = 0; for(; i < sstream_length(s); i++)
@@ -294,31 +294,36 @@ void WidgetFlow(ref(Widget) ctx, char *str)
 
     if(c == '=')
     {
-      expand = 10;
+      mod = 10;
+      continue;
+    }
+    else if(c == '/')
+    {
+      mod = 100;
       continue;
     }
     else if(c == '^')
     {
       _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
-        FLOW_MOVE_UP + expand);
+        FLOW_MOVE_UP + mod);
     }
     else if(c == 'v')
     {
       _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
-        FLOW_MOVE_DOWN + expand);
+        FLOW_MOVE_DOWN + mod);
     }
     else if(c == '<')
     {
       _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
-        FLOW_MOVE_LEFT + expand);
+        FLOW_MOVE_LEFT + mod);
     }
     else if(c == '>')
     {
       _FlowProcessorAddInstruction(_(parent).flowProcessor, ctx,
-        FLOW_MOVE_RIGHT + expand);
+        FLOW_MOVE_RIGHT + mod);
     }
 
-    expand = 0;
+    mod = 0;
   }}
 
   sstream_delete(s);

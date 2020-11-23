@@ -85,6 +85,8 @@ static void _FlowProcessorProcess(ref(FlowProcessor) ctx, struct FlowInstruction
   ref(Widget) w = instruction.widget;
   struct Rect bounds = WidgetBounds(w);
   struct Rect delta = {0};
+  struct Rect orig = {0};
+  int center = 0;
 
   bounds.x -= 4;
   bounds.y -= 4;
@@ -97,19 +99,33 @@ static void _FlowProcessorProcess(ref(FlowProcessor) ctx, struct FlowInstruction
     bounds.y = _(ctx).size.h - bounds.h;
   }
 
-  if(instruction.instruction == FLOW_MOVE_UP)
+  orig = bounds;
+
+  if(instruction.instruction == FLOW_CENTER_UP ||
+    instruction.instruction == FLOW_CENTER_DOWN ||
+    instruction.instruction == FLOW_CENTER_LEFT ||
+    instruction.instruction == FLOW_CENTER_RIGHT)
+  {
+    center = 1;
+  }
+
+  if(instruction.instruction == FLOW_MOVE_UP ||
+    instruction.instruction == FLOW_CENTER_UP)
   {
     delta.y--;
   }
-  else if(instruction.instruction == FLOW_MOVE_DOWN)
+  else if(instruction.instruction == FLOW_MOVE_DOWN ||
+    instruction.instruction == FLOW_CENTER_DOWN)
   {
     delta.y++;
   }
-  else if(instruction.instruction == FLOW_MOVE_LEFT)
+  else if(instruction.instruction == FLOW_MOVE_LEFT ||
+    instruction.instruction == FLOW_CENTER_LEFT)
   {
     delta.x--;
   }
-  else if(instruction.instruction == FLOW_MOVE_RIGHT)
+  else if(instruction.instruction == FLOW_MOVE_RIGHT ||
+    instruction.instruction == FLOW_CENTER_RIGHT)
   {
     delta.x++;
   }
@@ -144,10 +160,12 @@ static void _FlowProcessorProcess(ref(FlowProcessor) ctx, struct FlowInstruction
     bounds = tb;
   }
 
-/*
-  bounds.x += 2;
-  bounds.y += 2;
-*/
+  if(center)
+  {
+    bounds.x = (bounds.x + orig.x) / 2;
+    bounds.y = (bounds.y + orig.y) / 2;
+  }
+
   bounds.x += 4;
   bounds.y += 4;
   bounds.w -= 8;

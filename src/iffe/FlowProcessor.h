@@ -10,6 +10,11 @@
 #define FLOW_EXPAND_LEFT 13
 #define FLOW_EXPAND_RIGHT 14
 
+#define FLOW_CENTER_UP 101
+#define FLOW_CENTER_DOWN 102
+#define FLOW_CENTER_LEFT 103
+#define FLOW_CENTER_RIGHT 104
+
 struct FlowProcessor;
 struct Widget;
 struct Rect;

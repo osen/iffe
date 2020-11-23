@@ -7,5 +7,6 @@
 #include "Graphics.h"
 #include "Rect.h"
 #include "Color.h"
+#include "Size.h"
 
 #endif
