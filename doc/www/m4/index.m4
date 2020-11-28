@@ -5,7 +5,7 @@ include(`header.m4')
 </section>
 
 <section>
-_title(`Welcome to the Iffe UI Toolkit')
+_title1(`Welcome to the Iffe UI Library')
 
 Iffe is a UI library for the C programming language. It aims to keep
 things simple and fun. It was born out of frustration of current UI
@@ -60,8 +60,8 @@ great software rather than spending your time finding bugs.
   </li>
 </ul>
 
-Check out the tutorial page to get started using Iffe and to see some
-of these concepts put into practice.
+Check out the _link(`todo.html', `Tutorials') page to get started using
+Iffe and to see some of these concepts put into practice.
 
 </section>
 
@@ -109,8 +109,8 @@ should be quick to follow and natural to implement.
   </li>
 </ul>
 
-Check out the flow tutorial for more information and then take a look at some of the examples.
-</note_section>
+Check out the _link(`flow.html', `Flow Tutorial') for more information
+and then take a look at some of the examples.  </note_section>
 
 <section>
 _title(`Introducing the Stent Memory Checker (libstent)')

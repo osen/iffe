@@ -3,13 +3,15 @@ include(`common.m4')
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Home - Iffe UI Library</title>
+    <title>ifelse(defn(`_TITLE'), `', `', `_TITLE -') Iffe UI Library</title>
     <style>
 
 body
 {
   display: flex;
   margin: 0%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11pt;
 }
 
 img
@@ -98,6 +100,31 @@ note_title
   background-image: url('images/texture.png');
   background-repeat: repeat;
   //background: maroon; 
+  font-family: "Times New Roman", Times, serif;
+}
+
+a:link,
+a:visited
+{
+  color: maroon;
+  text-decoration: underline;
+}
+
+a:active
+{
+  color: gray;
+}
+
+note_section a:link,
+note_section a:visited
+{
+  color: white;
+  text-decoration: underline;
+}
+
+note_section a:active
+{
+  color: gray;
 }
 
 #sidebar a:link,
@@ -125,11 +152,11 @@ note_title
       <img src="images/logo.png" style="width: 150px">
       <spacer style="max-height: 15vh"></spacer>
       <column class="collapse" style="text-align: center">
-        <div><a href="#">Home</a></div>
-        <div><a href="#">Download</a></div>
-        <div><a href="#">Documentation</a></div>
-        <div><a href="#">Tutorials</a></div>
-        <div><a href="#">Contact</a></div>
+        <div><a href="index.html">Home</a></div>
+        <div><a href="todo.html">Download</a></div>
+        <div><a href="todo.html">Documentation</a></div>
+        <div><a href="todo.html">Tutorials</a></div>
+        <div><a href="todo.html">Contact</a></div>
       </column>
       <spacer style="border-bottom: 1px solid black"></spacer>
       <label style="padding-top: 0.5rem; text-align: center; color: white; font-size: 12pt">
