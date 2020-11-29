@@ -231,6 +231,12 @@ _code(`
   }
 ')
 
+Hopefully this tutorial has given you some insight into how Flow
+works. You may have even noticed that we did not actually need the
+Separator Widgets in order to achieve the layout we created. Your next
+step could be to have a look at some of the _link(`todo.html', `examples')
+and finally to _link(`todo.html', `download') Iffe and have a play.
+
 </section>
 
 include(`footer.m4')
