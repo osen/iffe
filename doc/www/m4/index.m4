@@ -11,7 +11,7 @@ Iffe is a UI library for the C programming language. It aims to keep
 things simple and fun. It was born out of frustration of current UI
 systems which are often too heavy in terms of dependencies, they lack in
 portability and maintenance or they are too awkward to use, relying on
-multiple diseperate layout scripts resulting in poor workflow or requiring
+multiple disparate layout scripts resulting in poor workflow or requiring
 too much boiler-plate code for tasks that should be trivial. Iffe has
 a number of project aims, including:
 
@@ -88,7 +88,7 @@ example:
   <li style="margin: 0.5rem 0">
 
 No tooling should be required, instead the layout can be defined
-separately from the logic but in the same homogenous C language as the
+separately from the logic but in the same homogeneous C language as the
 rest of the software. There really is no need for external XML or JSON
 files when C can serve the task in a simpler way.
 
@@ -139,14 +139,14 @@ deterministic manner.
   </li>
   <li style="margin: 0.5rem 0">
 
-Typesafe weak pointer in the debug build (similar to C++
+Type-safe weak pointer in the debug build (similar to C++
 std::weak_ptr&lt;T&gt;). Once testing has been done, this can be stripped
 in the release build ensuring there is zero additional overhead.
 
   </li>
   <li style="margin: 0.5rem 0">
 
-Typesafe dynamic arrays (similar to C++ std::vector&lt;T&gt;). In both
+Type-safe dynamic arrays (similar to C++ std::vector&lt;T&gt;). In both
 the debug and release builds this container greatly simplifies memory
 access in heap arrays and eliminates a range of programming mistakes.
 

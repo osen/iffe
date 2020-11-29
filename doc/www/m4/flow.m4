@@ -35,7 +35,7 @@ main function. Instead any Widget given the name MainWindow will be
 initialized and displayed as a top-level window. The program can be
 compiled as a normal C program using a command similar to:
 
-_code(`
+_command(`
   $ cc -oflow main.c -liffe -lX11
 ')
 
@@ -121,10 +121,115 @@ allows us to expand it in the vertical direction as well as
 horizontal. The final result of this can be seen in the following image.
 
 _image(`images/flow/6_separator_result.png')
+
+At this point, our code should be similar to the following:
+
+_code(`
+  #include &lt;iffe/iffe.h&gt;
+
+  widget(MainWindow, Init)
+  {
+    int dummy;
+  };
+
+  void OnInit(struct InitEvent *ev)
+  {
+    ref(Widget) button = WidgetAdd(ev->sender, Button);
+    WidgetFlow(button, "^<");
+
+    ref(Widget) text = WidgetAdd(ev->sender, TextBox);
+    WidgetFlow(text, "^<");
+
+    ref(Widget) sep = WidgetAdd(ev->sender, Separator);
+    WidgetFlow(text, "=<^");
+  }
+')
+
+_title(`Advanced Ordering')
+
+Next in this tutorial we will look further into the ways that ordering
+of the flow instructions can affect the layout and also provide useful
+results. We will add two new Widgets; a Text Area and another Separator.
+Ultimately we want all the remaining space to be taken up by the Text
+Area but for now we will only move it into the top left and not expand
+it just yet. As for the separator, we will use this to section off
+some button widgets but for now lets expand it horizontally and move it
+upwards. These tasks can be seen in the following code and subsequent image:
+
+_code(`
+  ref(Widget) area = WidgetAdd(ev->sender, TextArea);
+  WidgetFlow(area, "<^");
+
+  ref(Widget) sep2 = WidgetAdd(ev->sender, Separator);
+  WidgetFlow(sep2, "=<^");
+')
+
 _image(`images/flow/7_textarea_expand_1.png')
+
+Now that we have the Separator and Text Area out of the way temporarily,
+we simply add a Button. Next we move the Separator down to rest ontop
+of the newly placed button. Finally with everything else in the correct
+positions, we expand the Text Area in both dimensions. These steps are
+detailed below:
+
+_code(`
+  ref(Widget) button2 = WidgetAdd(ev->sender, Button);
+
+  WidgetFlow(sep2, "v");
+  WidgetFlow(area, "=>=v");
+')
+
 _image(`images/flow/8_textarea_expand_2.png')
+
+As you may have noticed, the WidgetFlow instructions can be specified
+multiple times and not only will they append to the current list but
+they will also be in sequence of any instructions on sibling Widgets. The
+final output can be seen in the following.
+
 _image(`images/flow/9_textarea_expand_result.png')
+
+Importantly, all of the Widgets are placed using instructions rather than
+absolute coordinates which means if we later resize the top-level window,
+these instructions are repeated and the UI layout effectively scales. For
+example the layout we have created should scale as shown:
+
 _image(`images/flow/10_resize.png')
+
+Finally a complete listing of the code required to create a program that
+provides this layout. This should be considerably simpler when compared
+with other UI systems.
+
+_code(`
+  #include &lt;iffe/iffe.h&gt;
+
+  widget(MainWindow, Init)
+  {
+    int dummy;
+  };
+
+  void OnInit(struct InitEvent *ev)
+  {
+    ref(Widget) button = WidgetAdd(ev->sender, Button);
+    WidgetFlow(button, "^<");
+
+    ref(Widget) text = WidgetAdd(ev->sender, TextBox);
+    WidgetFlow(text, "^<");
+
+    ref(Widget) sep = WidgetAdd(ev->sender, Separator);
+    WidgetFlow(text, "=<^");
+
+    ref(Widget) area = WidgetAdd(ev->sender, TextArea);
+    WidgetFlow(area, "<^");
+
+    ref(Widget) sep2 = WidgetAdd(ev->sender, Separator);
+    WidgetFlow(sep2, "=<^");
+
+    ref(Widget) button2 = WidgetAdd(ev->sender, Button);
+
+    WidgetFlow(sep2, "v");
+    WidgetFlow(area, "=>=v");
+  }
+')
 
 </section>
 
