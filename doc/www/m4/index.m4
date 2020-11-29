@@ -19,7 +19,7 @@ a number of project aims, including:
   <li style="margin: 0.5rem 0">
 
 _bold(`C89+') ensures that the code is kept simple and maximizes portability. Even
-to older platforms.
+to older platforms or those with very early C support.
 
   </li>
   <li style="margin: 0.5rem 0">
@@ -49,7 +49,7 @@ package managers from making a mess.
   <li style="margin: 0.5rem 0">
 
 _bold(`Provide simple layout system') and avoid tooling ensures that
-building UIs remains fast and fun.
+building UIs remains fast and fun even during maintenance.
 
   </li>
   <li style="margin: 0.5rem 0">
@@ -96,8 +96,8 @@ files when C can serve the task in a simpler way.
   <li style="margin: 0.5rem 0">
 
 Future maintenance should be simple. No need to maintain old build
-systems just to support a specific preprocessor should be needed. Instead
-a standards compliant C compiler should be all that is necessary.
+systems just to support a specific preprocessor tool. Instead a standards
+compliant C compiler should be all that is necessary.
 
   </li>
   <li style="margin: 0.5rem 0">
@@ -110,7 +110,9 @@ should be quick to follow and natural to implement.
 </ul>
 
 Check out the _link(`flow.html', `Flow Tutorial') for more information
-and then take a look at some of the examples.  </note_section>
+and then take a look at some of the _link(`todo.html', `examples').
+
+</note_section>
 
 <section>
 _title(`Introducing the Stent Memory Checker (libstent)')
@@ -132,37 +134,37 @@ following features:
 <ul>
   <li style="margin: 0.5rem 0">
 
-100% checked heap usage in debug builds ensures that the program
+_bold(`100% checked heap usage') in debug builds ensures that the program
 aborts with useful information about the mistake immediately and in a
 deterministic manner.
 
   </li>
   <li style="margin: 0.5rem 0">
 
-Type-safe weak pointer in the debug build (similar to C++
+_bold(`Type-safe weak pointer') in the debug build (similar to C++
 std::weak_ptr&lt;T&gt;). Once testing has been done, this can be stripped
 in the release build ensuring there is zero additional overhead.
 
   </li>
   <li style="margin: 0.5rem 0">
 
-Type-safe dynamic arrays (similar to C++ std::vector&lt;T&gt;). In both
+_bold(`Type-safe dynamic arrays') (similar to C++ std::vector&lt;T&gt;). In both
 the debug and release builds this container greatly simplifies memory
 access in heap arrays and eliminates a range of programming mistakes.
 
   </li>
   <li style="margin: 0.5rem 0">
 
-Leak checker in the debug build notifies the programmer upon exit of any
-allocations which were not subsequently freed along with their type and
-location in code where they were allocated.
+_bold(`Leak checker') in the debug build notifies the programmer upon
+exit of any allocations which were not subsequently freed along with
+their type and location in code where they were allocated.
 
   </li>
   <li style="margin: 0.5rem 0">
 
-100% portable C89+. No need for a specific compiler or platform. For
-example, no reliance on address sanitation support in your compiler or
-the ability to lock virtual memory.
+_bold(`100% portable C89+'). No need for a specific compiler or
+platform. For example, no reliance on address sanitation support in your
+compiler or the ability to lock virtual memory.
 
   </li>
 </ul>
@@ -172,9 +174,10 @@ encouraged that it is used for many C projects, even those entirely
 unrelated to UI. Of course Iffe can also be used without the memory
 checker. In this case standard raw pointers can be used as normal.
 
-Check out the Stent tutorial for detailed information on how it works. All
-the examples also use Stent but if you want to use Iffe directly without
-it, you can check out this specific example here.
+Check out the _link(`todo.html', `Stent Tutorial') for detailed
+information on how it works. All the examples also use Stent but if you
+want to use Iffe directly without it, you can check out a specific
+example _link(`todo.html', `here') demonstrating a raw usage of Iffe.
 
 </section>
 
