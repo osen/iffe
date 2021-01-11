@@ -77,6 +77,10 @@
     refvoid ud = _WidgetUserData(ctx);                    \
     if(!ud)                                               \
     {                                                     \
+      if(strcmp(sstream_cstr(WidgetType(ctx)), #T) != 0)  \
+      {                                                   \
+        panic("Attempting to initialize memory for incorrect type"); \
+      }                                                   \
       ud = _stent_alloc(size, #T, file, line);            \
       _WidgetSetUserData(ctx, ud);                        \
     }                                                     \
