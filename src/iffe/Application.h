@@ -16,6 +16,7 @@ void _ApplicationDestroy(ref(Application) ctx);
 void _ApplicationRun(ref(Application) ctx);
 
 void _ApplicationAddWidget(ref(Application) ctx, ref(Widget) widget);
+void _ApplicationRequestResize(ref(Application) ctx);
 
 #ifdef USE_X11
 Display *_ApplicationDisplay(ref(Application) ctx);

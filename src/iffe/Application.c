@@ -17,6 +17,7 @@ struct Application
   XtAppContext context;
   Widget toplevel;
 #endif
+  int mustResize;
 };
 
 static char *fallback_resources[] = {
@@ -31,12 +32,13 @@ ref(Application) _ApplicationCreate(int argc, char *argv[])
   ref(Application) rtn = allocate(Application);
   _application = rtn;
   _(rtn).windows = vector_new(ref(Widget));
+  _(rtn).mustResize = 1;
 
 #ifdef USE_X11
   Arg wargs[10] = {0};
   int n = 0;
-  XtSetArg(wargs[n], XtNwidth, 640); n++;
-  XtSetArg(wargs[n], XtNheight, 480); n++;
+  //XtSetArg(wargs[n], XtNwidth, 640); n++;
+  //XtSetArg(wargs[n], XtNheight, 480); n++;
   _(rtn).toplevel = XtAppInitialize(&_(rtn).context, "Xtodo", NULL, 0,
     &argc, argv, fallback_resources, wargs, n);
 
@@ -67,6 +69,17 @@ void _ApplicationDestroy(ref(Application) ctx)
   release(ctx);
 }
 
+void _ApplicationRequestResize(ref(Application) ctx)
+{
+  _(ctx).mustResize = 1;
+
+/*
+  foreach(ref(Widget) w, _(ctx).windows,
+    XClearArea(_(ctx).display, _WidgetWindow(w), 0, 0, 0, 0, True);
+  )
+*/
+}
+
 void _ApplicationRun(ref(Application) ctx)
 {
 #ifdef USE_X11
@@ -75,6 +88,15 @@ void _ApplicationRun(ref(Application) ctx)
   while(vector_size(_(ctx).windows) > 0)
   {
     ref(Widget) w = NULL;
+
+    if(_(ctx).mustResize)
+    {
+      _(ctx).mustResize = 0;
+
+      foreach(ref(Widget) winw, _(ctx).windows,
+        _WidgetResize(winw, WidgetSize(winw));
+      )
+    }
 
     XtAppNextEvent(_(ctx).context, &e);
 

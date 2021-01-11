@@ -57,7 +57,9 @@ static void _WidgetCreateWindow(ref(Widget) ctx)
   Widget w = XtCreatePopupShell("temp", shellWidgetClass,
     _ApplicationToplevel(_(ctx).application), wargs, n);
 
-  Widget f = XtCreateManagedWidget("form", compositeWidgetClass, w, NULL, 0);
+  n = 0;
+  XtSetArg(wargs[n], XtNbackground, ColorXColor(ColorRgb(250, 250, 250)).pixel); n++;
+  Widget f = XtCreateManagedWidget("form", compositeWidgetClass, w, wargs, n);
   XtPopup(w, XtGrabNone);
   _(ctx).internal = f;
 
@@ -173,14 +175,14 @@ void WidgetDestroy(ref(Widget) ctx)
 {
   if(!_(ctx).destroyed)
   {
+    foreach(ref(Widget) w, _(ctx).children,
+      WidgetDestroy(w);
+    )
+
     struct DestroyEvent ev = {0};
     ev.sender = ctx;
     _(ctx).events.destroy(&ev);
     _(ctx).destroyed = 1;
-
-    foreach(ref(Widget) w, _(ctx).children,
-      WidgetDestroy(w);
-    )
   }
 }
 
@@ -203,36 +205,63 @@ void WidgetSetSize(ref(Widget) ctx, struct Size size)
 {
   _(ctx).size = size;
 
+  // Dont actually resize widgets, just flag for resize
+  _ApplicationRequestResize(WidgetApplication(ctx));
+
+  // If dealing with the actual window, then resize that.
+  if(!_(ctx).parent)
+  {
+    XtResizeWidget(_(ctx).win, _(ctx).size.w, _(ctx).size.h, 0);
+  }
+
+/*
 #ifdef USE_X11
-  if(_(ctx).graphics)
+  if(!_(ctx).parent)
+  {
+    XtResizeWidget(_(ctx).win, _(ctx).size.w, _(ctx).size.h, 0);
+  }
+  else
   {
     XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
   }
 #endif
+*/
 }
 
 void WidgetSetWidth(ref(Widget) ctx, int width)
 {
   _(ctx).size.w = width;
 
+/*
 #ifdef USE_X11
-  if(_(ctx).graphics)
+  if(!_(ctx).parent)
+  {
+    XtResizeWidget(_(ctx).win, _(ctx).size.w, _(ctx).size.h, 0);
+  }
+  else
   {
     XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
   }
 #endif
+*/
 }
 
 void WidgetSetHeight(ref(Widget) ctx, int height)
 {
   _(ctx).size.h = height;
 
+/*
 #ifdef USE_X11
-  if(_(ctx).graphics)
+  if(!_(ctx).parent)
+  {
+    XtResizeWidget(_(ctx).win, _(ctx).size.w, _(ctx).size.h, 0);
+  }
+  else
   {
     XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
   }
 #endif
+*/
 }
 
 void _WidgetResize(ref(Widget) ctx, struct Size size)
@@ -249,25 +278,6 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
   foreach(ref(Widget) w, _(ctx).children,
     _WidgetResize(w, SizeWh(_(w).bounds.w, _(w).bounds.h));
   )
-
-  /*
-   * If root window, redraw everything because layouts likely changed.
-   */
-  if(_(ctx).graphics)
-  {
-    /*
-     * _WidgetDraw(ctx, RectXywh(0, 0, _(ctx).bounds.w, _(ctx).bounds.h));
-     */
-
-    /*
-     * XClearArea(_ApplicationDisplay(_(ctx).application),
-     *   _(ctx).window,
-     *   0, 0, _(ctx).bounds.w, _(ctx).bounds.h,
-     *   True);
-     */
-
-    //XClearArea(_ApplicationDisplay(_(ctx).application), _(ctx).window, 0, 0, 0, 0, True);
-  }
 }
 
 ref(Widget) WidgetRoot(ref(Widget) ctx)
@@ -386,7 +396,8 @@ void WidgetSetBackground(ref(Widget) ctx, struct Color background)
 #ifdef USE_X11
 Window _WidgetWindow(ref(Widget) ctx)
 {
-  return _(ctx).window;
+  //return _(ctx).window;
+  return XtWindow(_(ctx).win);
 }
 
 GC _WidgetGc(ref(Widget) ctx)

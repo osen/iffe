@@ -29,8 +29,6 @@ void OnInit(struct InitEvent *ev)
     p, wargs, n);
 
   _WidgetSetInternal(ev->sender, b);
-  //XtResizeWidget(b, 20, 20, 1);
-  //XtMoveWidget(b, 20, 20);
 #endif
 }
 
@@ -45,8 +43,10 @@ void OnResize(struct ResizeEvent *ev)
 
 void OnDraw(struct DrawEvent *ev)
 {
+/*
   ref(Graphics) g = ev->graphics;
 
   GraphicsRaisedRect(g, WidgetBounds(ev->sender), WidgetBackground(ev->sender));
+*/
 }
 

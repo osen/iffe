@@ -24,7 +24,7 @@ void OnInit(struct InitEvent *ev)
 
   Arg wargs[10] = {0};
   int n = 0;
-  XtSetArg(wargs[n], XtNbackground, ColorXColor(ColorRgb(255, 0, 0)).pixel); n++;
+  XtSetArg(wargs[n], XtNbackground, ColorXColor(ColorRgb(0, 0, 0)).pixel); n++;
   Widget b = XtCreateManagedWidget("button", labelWidgetClass,
     p, wargs, n);
 
@@ -43,8 +43,10 @@ void OnResize(struct ResizeEvent *ev)
 
 void OnDraw(struct DrawEvent *ev)
 {
+/*
   ref(Graphics) g = ev->graphics;
 
   GraphicsFillRect(g, WidgetBounds(ev->sender), ColorDark(WidgetBackground(ev->sender)));
+*/
 }
 
