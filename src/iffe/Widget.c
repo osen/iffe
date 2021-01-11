@@ -7,6 +7,13 @@
 #include "Color.h"
 #include "FlowProcessor.h"
 
+#ifdef USE_X11
+  #include <X11/Intrinsic.h>
+  #include <X11/IntrinsicP.h>
+  #include <X11/Shell.h>
+  #include <X11/StringDefs.h>
+#endif
+
 struct Widget
 {
   ref(Application) application;
@@ -28,6 +35,8 @@ struct Widget
   Window window;
   Atom deleteMessage;
   GC gc;
+  Widget internal;
+  Widget win;
 #endif
 };
 
@@ -40,11 +49,20 @@ static void _WidgetCreateWindow(ref(Widget) ctx)
   Display *display = _ApplicationDisplay(_(ctx).application);
   int screen = _ApplicationScreen(_(ctx).application);
 
-  _(ctx).window = XCreateWindow(display, RootWindow(display, screen),
-    0, 0, _(ctx).size.w, _(ctx).size.h, 0, 0,
-    CopyFromParent, CopyFromParent,
-    0, NULL);
+  Arg wargs[10] = {0};
+  int n = 0;
+  XtSetArg(wargs[n], XtNwidth, _(ctx).size.w); n++;
+  XtSetArg(wargs[n], XtNheight, _(ctx).size.h); n++;
 
+  Widget w = XtCreatePopupShell("temp", shellWidgetClass,
+    _ApplicationToplevel(_(ctx).application), wargs, n);
+
+  Widget f = XtCreateManagedWidget("form", compositeWidgetClass, w, NULL, 0);
+  XtPopup(w, XtGrabNone);
+  _(ctx).internal = f;
+
+  _(ctx).win = w;
+  _(ctx).window = XtWindow(w);
   _(ctx).gc = DefaultGC(display, screen);
 
   XSelectInput(display, _(ctx).window,
@@ -52,8 +70,6 @@ static void _WidgetCreateWindow(ref(Widget) ctx)
 
   _(ctx).deleteMessage = XInternAtom(display, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(display, _(ctx).window, &_(ctx).deleteMessage, 1);
-
-  XMapWindow(display, _(ctx).window);
 #endif
 }
 
@@ -138,7 +154,9 @@ void _WidgetDestroy(ref(Widget) ctx)
   if(!_(ctx).parent)
   {
 #ifdef USE_X11
-    XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
+    // TODO
+    // XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
+    XtDestroyWidget(_(ctx).win);
 #endif
   }
 
@@ -188,8 +206,7 @@ void WidgetSetSize(ref(Widget) ctx, struct Size size)
 #ifdef USE_X11
   if(_(ctx).graphics)
   {
-    XResizeWindow(_ApplicationDisplay(_(ctx).application),
-      _(ctx).window, size.w, size.h);
+    XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
   }
 #endif
 }
@@ -197,11 +214,25 @@ void WidgetSetSize(ref(Widget) ctx, struct Size size)
 void WidgetSetWidth(ref(Widget) ctx, int width)
 {
   _(ctx).size.w = width;
+
+#ifdef USE_X11
+  if(_(ctx).graphics)
+  {
+    XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
+  }
+#endif
 }
 
 void WidgetSetHeight(ref(Widget) ctx, int height)
 {
   _(ctx).size.h = height;
+
+#ifdef USE_X11
+  if(_(ctx).graphics)
+  {
+    XtResizeWidget(_(ctx).internal, _(ctx).size.w, _(ctx).size.h, 1);
+  }
+#endif
 }
 
 void _WidgetResize(ref(Widget) ctx, struct Size size)
@@ -235,7 +266,7 @@ void _WidgetResize(ref(Widget) ctx, struct Size size)
      *   True);
      */
 
-    XClearArea(_ApplicationDisplay(_(ctx).application), _(ctx).window, 0, 0, 0, 0, True);
+    //XClearArea(_ApplicationDisplay(_(ctx).application), _(ctx).window, 0, 0, 0, 0, True);
   }
 }
 
@@ -367,5 +398,16 @@ Atom _WidgetDeleteMessage(ref(Widget) ctx)
 {
   return _(ctx).deleteMessage;
 }
+
+void _WidgetSetInternal(ref(Widget) ctx, Widget internal)
+{
+  _(ctx).internal = internal;
+}
+
+Widget _WidgetInternal(ref(Widget) ctx)
+{
+  return _(ctx).internal;
+}
+
 #endif
 

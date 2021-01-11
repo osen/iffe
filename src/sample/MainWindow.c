@@ -15,15 +15,18 @@ void OnInit(struct InitEvent *ev)
 
   ref(Widget) w = WidgetAdd(panel, Button);
   WidgetFlow(w, "^<");
+  ButtonSetLabel(w, "Previous");
 
   w = WidgetAdd(panel, Button);
   WidgetFlow(w, ">");
+  ButtonSetLabel(w, "Next");
 
   ref(Widget) sw = WidgetAdd(ev->sender, Spacer);
   WidgetFlow(sw, "=<^");
 
   w = WidgetAdd(ev->sender, Button);
   WidgetFlow(w, ">");
+  ButtonSetLabel(w, "Close");
 
   WidgetFlow(sw, "v");
 }

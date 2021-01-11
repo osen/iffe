@@ -3,31 +3,46 @@
 #include "Size.h"
 #include "Rect.h"
 
+#ifdef USE_X11
+  #include <X11/Intrinsic.h>
+  #include <X11/StringDefs.h>
+#endif
+
 struct Application
 {
   vector(ref(Widget)) windows;
 #ifdef USE_X11
   Display *display;
   int screen;
+  XtAppContext context;
+  Widget toplevel;
 #endif
+};
+
+static char *fallback_resources[] = {
+  "*Label.Label: Hello, World",
+  NULL
 };
 
 ref(Application) _application;
 
-ref(Application) _ApplicationCreate()
+ref(Application) _ApplicationCreate(int argc, char *argv[])
 {
   ref(Application) rtn = allocate(Application);
   _application = rtn;
   _(rtn).windows = vector_new(ref(Widget));
 
 #ifdef USE_X11
-  _(rtn).display = XOpenDisplay(NULL);
+  Arg wargs[10] = {0};
+  int n = 0;
+  XtSetArg(wargs[n], XtNwidth, 640); n++;
+  XtSetArg(wargs[n], XtNheight, 480); n++;
+  _(rtn).toplevel = XtAppInitialize(&_(rtn).context, "Xtodo", NULL, 0,
+    &argc, argv, fallback_resources, wargs, n);
 
-  if(!_(rtn).display)
-  {
-    panic("Failed to open display");
-  }
+  //XtRealizeWidget(_(rtn).toplevel);
 
+  _(rtn).display = XtDisplay(_(rtn).toplevel);
   _(rtn).screen = DefaultScreen(_(rtn).display);
 #endif
 
@@ -45,7 +60,8 @@ void _ApplicationDestroy(ref(Application) ctx)
   vector_delete(_(ctx).windows);
 
 #ifdef USE_X11
-  XCloseDisplay(_(ctx).display);
+  // TODO
+  //XCloseDisplay(_(ctx).display);
 #endif
 
   release(ctx);
@@ -60,14 +76,18 @@ void _ApplicationRun(ref(Application) ctx)
   {
     ref(Widget) w = NULL;
 
-    XNextEvent(_(ctx).display, &e);
+    XtAppNextEvent(_(ctx).context, &e);
 
     foreach(w, _(ctx).windows,
       if(_WidgetWindow(w) == e.xany.window) break;
       w = NULL;
     )
 
-    if(!w) continue;
+    if(!w)
+    {
+      XtDispatchEvent(&e);
+      continue;
+    }
 
     if(e.type == ConfigureNotify)
     {
@@ -120,6 +140,8 @@ void _ApplicationRun(ref(Application) ctx)
         i--;
       }
     }}
+
+    XtDispatchEvent(&e);
   }
 #endif
 }
@@ -138,5 +160,10 @@ Display *_ApplicationDisplay(ref(Application) ctx)
 int _ApplicationScreen(ref(Application) ctx)
 {
   return _(ctx).screen;
+}
+
+Widget _ApplicationToplevel(ref(Application) ctx)
+{
+  return _(ctx).toplevel;
 }
 #endif

@@ -9,4 +9,6 @@
 #include "Color.h"
 #include "Size.h"
 
+#include "Button.h"
+
 #endif

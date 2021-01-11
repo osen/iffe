@@ -4,7 +4,7 @@
 
 int _main(int argc, char *argv[])
 {
-  ref(Application) app = _ApplicationCreate();
+  ref(Application) app = _ApplicationCreate(argc, argv);
   _ApplicationRun(app);
   _ApplicationDestroy(app);
 

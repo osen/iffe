@@ -7,6 +7,7 @@
 
 #ifdef USE_X11
   #include <X11/Xlib.h>
+  #include <X11/Intrinsic.h>
 #endif
 
 #define Init                                                     \
@@ -152,6 +153,8 @@ void _WidgetClick(ref(Widget) ctx);
 Window _WidgetWindow(ref(Widget) ctx);
 Atom _WidgetDeleteMessage(ref(Widget) ctx);
 GC _WidgetGc(ref(Widget) ctx);
+void _WidgetSetInternal(ref(Widget) ctx, Widget internal);
+Widget _WidgetInternal(ref(Widget) ctx);
 #endif
 
 #endif

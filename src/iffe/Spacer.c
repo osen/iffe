@@ -4,7 +4,13 @@
 #include "Rect.h"
 #include "Size.h"
 
-widget(Spacer, Init Draw)
+#ifdef USE_X11
+  #include <X11/Xaw/Label.h>
+  #include <X11/IntrinsicP.h>
+  #include <X11/StringDefs.h>
+#endif
+
+widget(Spacer, Init Resize Draw)
 {
   int dummy;
 };
@@ -12,6 +18,27 @@ widget(Spacer, Init Draw)
 void OnInit(struct InitEvent *ev)
 {
   WidgetSetSize(ev->sender, SizeWh(1, 1));
+
+#ifdef USE_X11
+  Widget p = _WidgetInternal(WidgetParent(ev->sender));
+
+  Arg wargs[10] = {0};
+  int n = 0;
+  XtSetArg(wargs[n], XtNbackground, ColorXColor(ColorRgb(255, 0, 0)).pixel); n++;
+  Widget b = XtCreateManagedWidget("button", labelWidgetClass,
+    p, wargs, n);
+
+  _WidgetSetInternal(ev->sender, b);
+#endif
+}
+
+void OnResize(struct ResizeEvent *ev)
+{
+  Widget w = _WidgetInternal(ev->sender);
+  struct Rect bounds = WidgetBounds(ev->sender);
+
+  XtResizeWidget(w, bounds.w, bounds.h, 0);
+  XtMoveWidget(w, bounds.x, bounds.y);
 }
 
 void OnDraw(struct DrawEvent *ev)

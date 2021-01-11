@@ -12,5 +12,8 @@ void OnInit(struct InitEvent *ev)
   ref(Widget) panel = WidgetAdd(ev->sender, Panel);
   WidgetSetSize(panel, SizeWh(320, 240));
   WidgetFlow(panel, "/</^");
+
+  ref(Widget) closeButton = WidgetAdd(panel, Button);
+  WidgetFlow(closeButton, ">v");
 }
 
