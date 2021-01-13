@@ -5,10 +5,19 @@
 struct Driver
 {
   void *handle;
-  void (*initialize)(int, char **);
+  void *(*initialize)(int, char **);
+  void (*cleanup)(void *);
+  void *(*create_window)(void *);
 };
 
-ref(Driver) DriverCreate(int argc, char *argv[])
+#define SYM(N) \
+  _(rtn).N = dlsym(_(rtn).handle, #N); \
+  if(!_(rtn).N) \
+  { \
+    panic("Failed to access library function"); \
+  }
+
+ref(Driver) DriverCreate()
 {
   ref(Driver) rtn = allocate(Driver);
 
@@ -19,19 +28,25 @@ ref(Driver) DriverCreate(int argc, char *argv[])
     panic("Failed to load driver");
   }
 
-  _(rtn).initialize = dlsym(_(rtn).handle, "_initialize");
-
-  if(!_(rtn).initialize)
-  {
-    panic("Failed to access library function");
-  }
-
-  _(rtn).initialize(argc, argv);
+  SYM(initialize)
+  SYM(cleanup)
+  SYM(create_window)
 
   return rtn;
 }
 
 void DriverDestroy(ref(Driver) ctx)
 {
+  // TODO
   release(ctx);
+}
+
+void *DriverInitialize(ref(Driver) ctx, int argc, char *argv[])
+{
+  return _(ctx).initialize(argc, argv);
+}
+
+void *DriverCreateWindow(ref(Driver) ctx, void *state)
+{
+  return _(ctx).create_window(state);
 }

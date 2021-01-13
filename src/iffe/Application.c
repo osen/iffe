@@ -20,6 +20,7 @@ struct Application
 #endif
   int mustResize;
   ref(Driver) driver;
+  void *state;
 };
 
 static char *fallback_resources[] = {
@@ -36,7 +37,8 @@ ref(Application) _ApplicationCreate(int argc, char *argv[])
   _(rtn).windows = vector_new(ref(Widget));
   _(rtn).mustResize = 1;
 
-  _(rtn).driver = DriverCreate(argc, argv);
+  _(rtn).driver = DriverCreate();
+  _(rtn).state = DriverInitialize(_(rtn).driver, argc, argv);
 
 #ifdef USE_X11
   Arg wargs[10] = {0};
@@ -177,6 +179,11 @@ void _ApplicationRun(ref(Application) ctx)
 void _ApplicationAddWidget(ref(Application) ctx, ref(Widget) widget)
 {
   vector_push(_(ctx).windows, widget);
+}
+
+ref(Driver) ApplicationDriver(ref(Application) ctx)
+{
+  return _(ctx).driver;
 }
 
 #ifdef USE_X11

@@ -1,6 +1,4 @@
 #include "stent.h"
-#include "Widget.h"
-
 #include "config.h"
 
 #ifdef USE_X11
@@ -9,6 +7,8 @@
 #endif
 
 struct Application;
+struct Driver;
+struct Widget;
 
 ref(Application) _ApplicationCreate(int argc, char *argv[]);
 void _ApplicationDestroy(ref(Application) ctx);
@@ -17,6 +17,7 @@ void _ApplicationRun(ref(Application) ctx);
 
 void _ApplicationAddWidget(ref(Application) ctx, ref(Widget) widget);
 void _ApplicationRequestResize(ref(Application) ctx);
+ref(Driver) ApplicationDriver(ref(Application) ctx);
 
 #ifdef USE_X11
 Display *_ApplicationDisplay(ref(Application) ctx);
