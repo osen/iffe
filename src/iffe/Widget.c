@@ -6,6 +6,7 @@
 #include "Graphics.h"
 #include "Color.h"
 #include "FlowProcessor.h"
+#include "Driver.h"
 
 #ifdef USE_X11
   #include <X11/Intrinsic.h>
@@ -32,6 +33,8 @@ struct Widget
   int destroyed;
   int drawn;
 
+  void *_internal;
+
 #ifdef USE_X11
   Window window;
   Atom deleteMessage;
@@ -46,6 +49,7 @@ extern ref(Application) _application;
 
 static void _WidgetCreateWindow(ref(Widget) ctx)
 {
+  _(ctx)._internal = DriverCreateWindow(ApplicationDriver(WidgetApplication(ctx)));
 #ifdef USE_X11
   Display *display = _ApplicationDisplay(_(ctx).application);
   int screen = _ApplicationScreen(_(ctx).application);

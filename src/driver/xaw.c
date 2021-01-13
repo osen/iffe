@@ -11,14 +11,21 @@ struct State
   int screen;
   XtAppContext context;
   Widget toplevel;
+
+  struct Widget *widgets;
 };
 
 struct Widget
 {
   Widget widget;
+  void *userdata;
+  struct Widget *next;
 
   Widget window;
   Atom deleteMessage;
+
+  // void * is widget (not userdata. This can be fetched).
+  void (*close)(void *);
 };
 
 static char *fallback_resources[] = {
@@ -68,9 +75,25 @@ void *create_window(void *state)
   rtn->window = w;
   rtn->widget = f;
 
+  XSelectInput(s->display, XtWindow(w),
+    ExposureMask | KeyPressMask | ButtonPressMask | ButtonReleaseMask |
+    StructureNotifyMask);
+
   rtn->deleteMessage = XInternAtom(s->display, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(s->display, XtWindow(rtn->window), &rtn->deleteMessage, 1);
 
   return rtn;
+}
+
+void run(void *state)
+{
+  struct State *s = state;
+  XEvent e = {0};
+
+  while(!XtAppGetExitFlag(s->context))
+  {
+    XtAppNextEvent(s->context, &e);
+    XtDispatchEvent(&e);
+  }
 }
 

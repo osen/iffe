@@ -5,6 +5,7 @@
 struct Driver
 {
   void *handle;
+  void *state;
   void *(*initialize)(int, char **);
   void (*cleanup)(void *);
   void *(*create_window)(void *);
@@ -43,10 +44,13 @@ void DriverDestroy(ref(Driver) ctx)
 
 void *DriverInitialize(ref(Driver) ctx, int argc, char *argv[])
 {
-  return _(ctx).initialize(argc, argv);
+  _(ctx).state = _(ctx).initialize(argc, argv);
+
+  return _(ctx).state;
 }
 
-void *DriverCreateWindow(ref(Driver) ctx, void *state)
+void *DriverCreateWindow(ref(Driver) ctx)
 {
-  return _(ctx).create_window(state);
+  return _(ctx).create_window(_(ctx).state);
 }
+
