@@ -2,6 +2,7 @@
 #include "Widget.h"
 #include "Size.h"
 #include "Rect.h"
+#include "Driver.h"
 
 #ifdef USE_X11
   #include <X11/Intrinsic.h>
@@ -18,6 +19,7 @@ struct Application
   Widget toplevel;
 #endif
   int mustResize;
+  ref(Driver) driver;
 };
 
 static char *fallback_resources[] = {
@@ -33,6 +35,8 @@ ref(Application) _ApplicationCreate(int argc, char *argv[])
   _application = rtn;
   _(rtn).windows = vector_new(ref(Widget));
   _(rtn).mustResize = 1;
+
+  _(rtn).driver = DriverCreate(argc, argv);
 
 #ifdef USE_X11
   Arg wargs[10] = {0};
@@ -65,6 +69,8 @@ void _ApplicationDestroy(ref(Application) ctx)
   // TODO
   //XCloseDisplay(_(ctx).display);
 #endif
+
+  DriverDestroy(_(ctx).driver);
 
   release(ctx);
 }
@@ -188,4 +194,10 @@ Widget _ApplicationToplevel(ref(Application) ctx)
 {
   return _(ctx).toplevel;
 }
+
+XtAppContext _ApplicationContext(ref(Application) ctx)
+{
+  return _(ctx).context;
+}
+
 #endif

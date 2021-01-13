@@ -136,6 +136,8 @@ struct Rect WidgetBounds(ref(Widget) ctx);
 void WidgetFlow(ref(Widget) ctx, char *str);
 struct Color WidgetBackground(ref(Widget) ctx);
 void WidgetSetBackground(ref(Widget) ctx, struct Color background);
+void WidgetSetBorder(ref(Widget) ctx, int border);
+int WidgetBorder(ref(Widget) ctx);
 
 ref(sstream) WidgetType(ref(Widget) ctx);
 

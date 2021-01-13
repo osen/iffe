@@ -18,6 +18,7 @@ widget(Spacer, Init Resize Draw)
 void OnInit(struct InitEvent *ev)
 {
   WidgetSetSize(ev->sender, SizeWh(1, 1));
+  WidgetSetBorder(ev->sender, 0);
 
 #ifdef USE_X11
   Widget p = _WidgetInternal(WidgetParent(ev->sender));
@@ -37,7 +38,7 @@ void OnResize(struct ResizeEvent *ev)
   Widget w = _WidgetInternal(ev->sender);
   struct Rect bounds = WidgetBounds(ev->sender);
 
-  XtResizeWidget(w, bounds.w, bounds.h, 0);
+  XtResizeWidget(w, bounds.w, bounds.h, WidgetBorder(ev->sender));
   XtMoveWidget(w, bounds.x, bounds.y);
 }
 

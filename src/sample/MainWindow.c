@@ -28,6 +28,6 @@ void OnInit(struct InitEvent *ev)
   WidgetFlow(w, ">");
   ButtonSetLabel(w, "Close");
 
-  WidgetFlow(sw, "v");
+  WidgetFlow(sw, "v=^");
 }
 

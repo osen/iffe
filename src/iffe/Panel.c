@@ -37,7 +37,7 @@ void OnResize(struct ResizeEvent *ev)
   Widget w = _WidgetInternal(ev->sender);
   struct Rect bounds = WidgetBounds(ev->sender);
 
-  XtResizeWidget(w, bounds.w, bounds.h, 1);
+  XtResizeWidget(w, bounds.w, bounds.h, WidgetBorder(ev->sender));
   XtMoveWidget(w, bounds.x, bounds.y);
 }
 

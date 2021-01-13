@@ -196,6 +196,8 @@ void _FlowProcessorReset(ref(FlowProcessor) ctx, struct Rect bounds, vector(ref(
     struct Rect b = WidgetBounds(w);
     //b.x += bounds.x;
     //b.y += bounds.y;
+    b.w -= WidgetBorder(w) * 2;
+    b.h -= WidgetBorder(w) * 2;
     _WidgetSetBounds(w, b);
   )
 

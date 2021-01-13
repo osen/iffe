@@ -22,4 +22,5 @@ void _ApplicationRequestResize(ref(Application) ctx);
 Display *_ApplicationDisplay(ref(Application) ctx);
 int _ApplicationScreen(ref(Application) ctx);
 Widget _ApplicationToplevel(ref(Application) ctx);
+XtAppContext _ApplicationContext(ref(Application) ctx);
 #endif

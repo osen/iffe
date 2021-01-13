@@ -4,22 +4,19 @@
 #include "Rect.h"
 #include "Size.h"
 #include "config.h"
-#include "Application.h"
 
 #ifdef USE_X11
-  #include <X11/Xaw/Command.h>
+  #include <X11/Xaw/Toggle.h>
   #include <X11/IntrinsicP.h>
   #include <X11/StringDefs.h>
 #endif
 
-#include <stdio.h>
-
-widget(Button, Init Resize Draw)
+widget(Toggle, Init Resize)
 {
   int dummy;
 };
 
-void ButtonSetLabel(ref(Widget) ctx, const char *label)
+void ToggleSetLabel(ref(Widget) ctx, const char *label)
 {
   Arg wargs[2] = {0};
   int n = 0;
@@ -35,8 +32,7 @@ void OnInit(struct InitEvent *ev)
   Arg wargs[10] = {0};
   int n = 0;
   XtSetArg(wargs[n], XtNlabel, ""); n++;
-
-  Widget b = XtCreateManagedWidget("button", commandWidgetClass,
+  Widget b = XtCreateManagedWidget("button", toggleWidgetClass,
     p, wargs, n);
 
   _WidgetSetInternal(ev->sender, b);
@@ -51,18 +47,7 @@ void OnResize(struct ResizeEvent *ev)
   Widget w = _WidgetInternal(ev->sender);
   struct Rect bounds = WidgetBounds(ev->sender);
 
-  XtResizeWidget(w, bounds.w, bounds.h, WidgetBorder(ev->sender));
+  XtResizeWidget(w, bounds.w - 2, bounds.h - 2, 1);
   XtMoveWidget(w, bounds.x, bounds.y);
-}
-
-void OnDraw(struct DrawEvent *ev)
-{
-/*
-  ref(Graphics) g = ev->graphics;
-  struct Rect b = WidgetBounds(ev->sender);
-
-  GraphicsRaisedRect(g, b, WidgetBackground(ev->sender));
-  //GraphicsDrawRect(g, b, ColorRgb(SELECTED_COLOR));
-*/
 }
 
