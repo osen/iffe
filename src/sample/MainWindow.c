@@ -7,6 +7,7 @@ widget(MainWindow, Init)
 
 void OnInit(struct InitEvent *ev)
 {
+/*
   WidgetAdd(NULL, LoginWindow);
 
   ref(Widget) panel = WidgetAdd(ev->sender, Panel);
@@ -29,5 +30,6 @@ void OnInit(struct InitEvent *ev)
   ButtonSetLabel(w, "Close");
 
   WidgetFlow(sw, "v=^");
+*/
 }
 

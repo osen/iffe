@@ -9,6 +9,7 @@ struct Driver
   void *(*initialize)(int, char **);
   void (*cleanup)(void *);
   void *(*create_window)(void *);
+  void (*run)(void *);
 };
 
 #define SYM(N) \
@@ -32,6 +33,7 @@ ref(Driver) DriverCreate()
   SYM(initialize)
   SYM(cleanup)
   SYM(create_window)
+  SYM(run)
 
   return rtn;
 }
@@ -52,5 +54,10 @@ void *DriverInitialize(ref(Driver) ctx, int argc, char *argv[])
 void *DriverCreateWindow(ref(Driver) ctx)
 {
   return _(ctx).create_window(_(ctx).state);
+}
+
+void DriverRun(ref(Driver) ctx)
+{
+  _(ctx).run(_(ctx).state);
 }
 

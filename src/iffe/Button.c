@@ -27,6 +27,13 @@ void ButtonSetLabel(ref(Widget) ctx, const char *label)
   XtSetValues(_WidgetInternal(ctx), wargs, n);
 }
 
+/*
+static void destroy(Widget w, XtPointer cd, XtPointer ud)
+{
+  printf("Destroyed\n");
+}
+*/
+
 void OnInit(struct InitEvent *ev)
 {
 #ifdef USE_X11
@@ -35,11 +42,14 @@ void OnInit(struct InitEvent *ev)
   Arg wargs[10] = {0};
   int n = 0;
   XtSetArg(wargs[n], XtNlabel, ""); n++;
+  //XtSetArg(wargs[n], XtNdestroyCallback, destroy); n++;
 
   Widget b = XtCreateManagedWidget("button", commandWidgetClass,
     p, wargs, n);
 
   _WidgetSetInternal(ev->sender, b);
+
+  //XtAddCallback(b, XtNdestroyCallback, destroy, NULL);
 #endif
 
   WidgetSetBackground(ev->sender, ColorRgb(BUTTON_COLOR));

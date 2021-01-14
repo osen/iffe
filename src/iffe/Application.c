@@ -89,7 +89,9 @@ void _ApplicationRequestResize(ref(Application) ctx)
 
 void _ApplicationRun(ref(Application) ctx)
 {
-#ifdef USE_X11
+  DriverRun(_(ctx).driver);
+
+#ifdef _USE_X11
   XEvent e = {0};
 
   while(vector_size(_(ctx).windows) > 0)

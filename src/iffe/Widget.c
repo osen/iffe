@@ -50,7 +50,7 @@ extern ref(Application) _application;
 static void _WidgetCreateWindow(ref(Widget) ctx)
 {
   _(ctx)._internal = DriverCreateWindow(ApplicationDriver(WidgetApplication(ctx)));
-#ifdef USE_X11
+#ifdef _USE_X11
   Display *display = _ApplicationDisplay(_(ctx).application);
   int screen = _ApplicationScreen(_(ctx).application);
 
@@ -88,6 +88,7 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
   _(rtn).flowProcessor = _FlowProcessorCreate();
   _(rtn).background = ColorRgb(WIDGET_COLOR);
   _(rtn).border = 1;
+  _(rtn).type = sstream_new_cstr(name);
 
   if(parent)
   {
@@ -106,8 +107,6 @@ ref(Widget) _WidgetCreate(ref(Widget) parent, const char *name)
     _WidgetCreateWindow(rtn);
     _(rtn).graphics = _GraphicsCreate(rtn);
   }
-
-  _(rtn).type = sstream_new_cstr(name);
 
   return rtn;
 }
@@ -161,7 +160,7 @@ void _WidgetDestroy(ref(Widget) ctx)
 
   if(!_(ctx).parent)
   {
-#ifdef USE_X11
+#ifdef _USE_X11
     // TODO
     // XDestroyWindow(_ApplicationDisplay(_(ctx).application), _(ctx).window);
     XtDestroyWidget(_(ctx).win);

@@ -4,12 +4,14 @@
 #include <X11/StringDefs.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 
 struct State
 {
   Display *display;
   int screen;
   XtAppContext context;
+  Atom deleteMessage;
   Widget toplevel;
 
   struct Widget *widgets;
@@ -17,15 +19,16 @@ struct State
 
 struct Widget
 {
-  Widget widget;
-  void *userdata;
   struct Widget *next;
 
-  Widget window;
-  Atom deleteMessage;
+  Widget widget;
+  void *userdata;
 
-  // void * is widget (not userdata. This can be fetched).
-  void (*close)(void *);
+  Widget windowWidget;
+  Window window;
+  int destroyed;
+
+  void (*destroyFunc)(void *);
 };
 
 static char *fallback_resources[] = {
@@ -42,6 +45,8 @@ void *initialize(int argc, char *argv[])
   rtn->display = XtDisplay(rtn->toplevel);
   rtn->screen = DefaultScreen(rtn->display);
 
+  rtn->deleteMessage = XInternAtom(rtn->display, "WM_DELETE_WINDOW", False);
+
   return rtn;
 }
 
@@ -52,6 +57,16 @@ void cleanup(void *state)
   // TODO
 
   free(s);
+}
+
+static void window_destroy_cb(Widget _w, XtPointer cd, XtPointer ud)
+{
+  struct Widget *w = cd;
+
+  if(w->destroyFunc)
+  {
+    w->destroyFunc(w);
+  }
 }
 
 void *create_window(void *state)
@@ -72,15 +87,20 @@ void *create_window(void *state)
 
   XtPopup(w, XtGrabNone);
 
-  rtn->window = w;
+  rtn->windowWidget = w;
+  rtn->window = XtWindow(w);
   rtn->widget = f;
 
-  XSelectInput(s->display, XtWindow(w),
+  XSelectInput(s->display, rtn->window,
     ExposureMask | KeyPressMask | ButtonPressMask | ButtonReleaseMask |
     StructureNotifyMask);
 
-  rtn->deleteMessage = XInternAtom(s->display, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(s->display, XtWindow(rtn->window), &rtn->deleteMessage, 1);
+  XSetWMProtocols(s->display, rtn->window, &s->deleteMessage, 1);
+
+  XtAddCallback(f, XtNdestroyCallback, window_destroy_cb, rtn);
+
+  rtn->next = s->widgets;
+  s->widgets = rtn;
 
   return rtn;
 }
@@ -92,8 +112,52 @@ void run(void *state)
 
   while(!XtAppGetExitFlag(s->context))
   {
-    XtAppNextEvent(s->context, &e);
-    XtDispatchEvent(&e);
+    while(XtAppPending(s->context))
+    {
+      XtAppNextEvent(s->context, &e);
+
+      if(e.type == ClientMessage)
+      {
+        if(e.xclient.data.l[0] == s->deleteMessage)
+        {
+          struct Widget *w = s->widgets;
+
+          while(w)
+          {
+            if(w->window == e.xany.window)
+            {
+              w->destroyed = 1;
+            }
+
+            w = w->next;
+          }
+        }
+      }
+
+      XtDispatchEvent(&e);
+    }
+
+    struct Widget *w = s->widgets;
+    struct Widget **l = &s->widgets;
+
+    while(w)
+    {
+      if(w->destroyed)
+      {
+        struct Widget *dw = w;
+        *l = w->next;
+        w = w->next;
+        XtDestroyWidget(dw->windowWidget);
+        free(dw);
+      }
+      else
+      {
+        l = &w->next;
+        w = w->next;
+      }
+    }
+
+    if(!s->widgets) break;
   }
 }
 
